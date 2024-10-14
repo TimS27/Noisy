@@ -3,14 +3,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Reading CSV file
-data = pd.read_csv("10102024-Measure-DANL-with-Photodiode-on-blocked-Trace.csv")
+data = pd.read_csv("14102024-DANL-with-photodiode-on-blocked-1MHz-RBW.csv")
  
 # Converting column data to list then array
 frequencies = np.array(data['[Hz]'].tolist())
 measured_electronic_power_spectral_density = np.array(data['Trace1[dBm]'].tolist())
 #measured_electronic_power_spectral_density_corrected = measured_electronic_power_spectral_density  # measurements were with -19 dBm reference level
 
-responsivity = 1.04 # [A/W]
+responsivity = 1    # [A/W] (actually wavelength dependend, peak responsivity at is 1.04 for ThorLabs PDA10CF(-EC))
 nep = 1.2e-11       # [W/sqrt(Hz)] optical power
 gain = 1e4          # [V/A]
 r = 50              # [Ohm]
@@ -22,7 +22,7 @@ neea = nep * responsivity * gain    # [V/sqrt(Hz)]
 electronic_power_spectral_density = (neea ** 2) / r # [W/Hz]
 
 # calculate electronic power spectral density per 10 kHz = RBW
-electronic_power_spectral_density_per_10kHz = electronic_power_spectral_density * 1e4
+electronic_power_spectral_density_per_10kHz = electronic_power_spectral_density * 1e6
 
 # calculate electronic power spectral density in dBm
 electronic_power_spectral_density_per_10kHz_dBm = 10 * np.log10(electronic_power_spectral_density_per_10kHz * 1000)
@@ -40,8 +40,8 @@ plt.figure()
 plt.plot(f, electronic_power_spectral_density_per_10kHz_dBm_array)
 plt.plot(frequencies, measured_electronic_power_spectral_density)
 plt.xlim(1e5, 1.6e9)
-plt.title('Measured PSD vs. NEP-calculated PSD')
+plt.title('Measured PSD vs. NEP-calculated PSD @ 10 kHz RWB')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Electronic power spectral density [dBm]')
-plt.legend(['Measured PSD','NEP-calculated PSD'])
+plt.legend(['NEP-calculated PSD', 'Measured PSD'])
 plt.show()
