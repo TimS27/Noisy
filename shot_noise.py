@@ -31,9 +31,14 @@ for N in [1000]:
       
       #photons_arm1 = np.array([], dtype=(np.float64))
       #photons_arm2 = np.array([], dtype=(np.float64))
-      photons_arm1 = np.random.poisson(((np.sqrt(L/2) + np.sqrt(S/2))**2), size=size)   #.astype(np.float64)
-      photons_arm2 = np.random.poisson(((np.sqrt(L/2) - np.sqrt(S/2))**2), size=size)
-      
+      if L < 10000:
+        photons_arm1 = np.random.poisson(((np.sqrt(L/2) + np.sqrt(S/2))**2), size=size)
+        photons_arm2 = np.random.poisson(((np.sqrt(L/2) - np.sqrt(S/2))**2), size=size)
+
+      else:
+        photons_arm1 = np.random.normal(((np.sqrt(L/2) + np.sqrt(S/2))**2), np.sqrt((np.sqrt(L/2) + np.sqrt(S/2))**2), size)
+        photons_arm2 = np.random.normal(((np.sqrt(L/2) - np.sqrt(S/2))**2), np.sqrt((np.sqrt(L/2) + np.sqrt(S/2))**2), size)
+
       print(type(photons_arm1))
       photocurrent_arm1 = photons_arm1 + np.random.normal(scale=N, size=size)
       photocurrent_arm2 = photons_arm2 + np.random.normal(scale=N, size=size)
