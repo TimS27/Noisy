@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 x = np.linspace(0, 9, 10)
-y1 = np.random.poisson(100,1000) # first value is mean, second value is number of samples
-y2 = np.random.normal(100, np.sqrt(100),1000) # mean, standard deviation, number of samples 
+y1 = np.random.poisson(1,2) # first value is mean, second value is number of samples
+y2 = np.random.normal(1, np.sqrt(1),1000) # mean, standard deviation, number of samples 
 print(y1)
 print(y2)
 

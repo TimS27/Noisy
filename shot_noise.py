@@ -17,7 +17,7 @@ print('Photons NEP: ', photons_NEP, 'W')
 print('Photons LO: ', photons_LO)
 
 fig, (ax1, ax2) = plt.subplots(1, 2)
-fig.suptitle('Balanced Detection')
+fig.suptitle('SNR vs. # Local oscillator photons in Balanced Detection')
 
 Ns = [1000, photons_NEP]  # Different numbers of NEP photons
 
