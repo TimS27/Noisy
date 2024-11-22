@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Open the .sif file
-data, info = sif_parser.np_open('split-detector-206-100-206-final3-10min.sif')  # dataset has 30000 spectra, measured for 10 min = 600 s with 50 Hz
+data, info = sif_parser.np_open('baclground-kinetic-series-10kk-samples-2000Hz-20x20.sif')  # dataset has 30000 spectra, measured for 10 min = 600 s with 50 Hz
 
 # Get rid of unnecessary array structure of read sif file
 flattened_arrays = [np.array(sublist).flatten() for sublist in data]
@@ -15,13 +15,15 @@ flattened_arrays = [np.array(sublist).flatten() for sublist in data]
 reference = []
 sample = []
 
+
 for i in range(len(flattened_arrays)):
-    reference.append(flattened_arrays[i][:2048])
-    sample.append(flattened_arrays[i][2048:])
+    reference.append(flattened_arrays[i][:5])   #[:2048])    # [:2048] for full horizontal detector
+    #sample.append(flattened_arrays[i][2048:])
 
 reference = np.array(reference)
-sample = np.array(sample)
-difference = reference - sample
+#sample = np.array(sample)
+#difference = reference - sample
+
 
 '''
 # Plot first recorded sample and reference spectrum
@@ -137,7 +139,7 @@ num_points = 5  # Number of spectral points
 spectral_data = np.random.poisson(lam=100, size=(num_times, num_points))
 
 # Calculate Allan variance and deviation
-taus, time, allan_variance, allan_deviation, weighted_allan_variance, weighted_allan_deviation, allan_variances_mOD = calculate_allan_variance(difference) # or use spectral_data instead of reference
+taus, time, allan_variance, allan_deviation, weighted_allan_variance, weighted_allan_deviation, allan_variances_mOD = calculate_allan_variance(reference) # or use difference or spectral_data
 
 # Visualize results
 plot_allan(time, allan_variance, allan_deviation, weighted_allan_variance, allan_variances_mOD, num_points)
