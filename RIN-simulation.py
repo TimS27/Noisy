@@ -17,15 +17,17 @@ laser_wavelength = 1064e-9  # [nm]
 P_avg = 230e-3  # Mean optical power (230 mW) [J/s], for 1s energy equals average power in Joules
 photon_energy = const.h * const.c / laser_wavelength    # [J]
 avg_photon_number = P_avg / photon_energy  # [1/s]
-relative_fluctuation_amplitude = 0.01  # Relative fluctuation amplitude (1% of mean power)
+relative_fluctuation_amplitude = 0.001  # Relative fluctuation amplitude (1% of mean power)
 
 # Photodiode parameters
 R = 1 # Photodetector responsivity [A/W]
+r = 50  # [Ohm]
 
 # Relaxation oscillation parameters
-f_ro = 0.65e6  # Relaxation oscillation frequency (approx. 150 kHz for Nd:YAG)
-damping_factor = 2e3  # Damping factor for oscillations
-relaxation_amplitude = 0.00001  # Amplitude of relaxation oscillations
+f_ro = 650e3  # Relaxation oscillation frequency (approx. 150 kHz for Nd:YAG)
+damping_factor = 2e4  # Damping factor for oscillations
+relaxation_amplitude = 0.000000025  # Amplitude of relaxation oscillations
+num_bursts = 200  # Number of random bursts
 
 # Noise contributions
 white_noise_amplitude = 1e-5  # Amplitude of white noise
@@ -42,7 +44,7 @@ nep = 1.2e-11   # [W/sqrt(Hz)] optical power
 gain = 1e4      # [V/A]
 neea = nep * R * gain    # [V/sqrt(Hz)]
 # square neea and use P=R*I^2
-electronic_power_spectral_density = (neea ** 2) / R # [W/Hz]
+electronic_power_spectral_density = (neea ** 2) / r # [W/Hz]
 # calculate electronic power spectral density per delta_f = RBW
 #electronic_power_spectral_density_per_delta_f = electronic_power_spectral_density * (delta_f)
 # calculate electronic power spectral density in dB/Hz
@@ -59,13 +61,28 @@ acoustic_noise = 0.001 * P_avg * np.sin(2 * np.pi * acoustic_frequency * time)
 
 # Generate relaxation oscillations
 omega_ro = 2 * np.pi * f_ro  # Angular frequency
-envelope = np.exp(-damping_factor * time)  # Damped envelope
-relaxation_oscillations = relaxation_amplitude * np.sin(omega_ro * time) * envelope
+relaxation_signal = np.zeros_like(time)
+#envelope = np.exp(-damping_factor * time)  # Damped envelope
+#relaxation_oscillations = relaxation_amplitude * np.sin(omega_ro * time) * envelope
+
+# Random bursts
+burst_times = np.random.choice(time, num_bursts, replace=False)  # Random start times
+burst_durations = 0.0005 * np.random.rand(num_bursts)  # Random burst durations (up to 0.5 ms)
+
+for burst_time, burst_duration in zip(burst_times, burst_durations):
+    burst_start = int(burst_time * fs)
+    burst_end = min(burst_start + int(burst_duration * fs), N)
+    burst_length = burst_end - burst_start
+
+    if burst_length > 0:
+        envelope = np.exp(-damping_factor * (np.arange(burst_length) / fs))  # Damped envelope
+        oscillation = relaxation_amplitude * np.sin(omega_ro * np.arange(burst_length) / fs)
+        relaxation_signal[burst_start:burst_end] += oscillation * envelope
 
 # Combine all components
 fluctuations = (
     relative_fluctuation_amplitude * P_avg * (white_noise + flicker_noise)
-    + relaxation_oscillations
+    + relaxation_signal
     + shot_noise
     #+ acoustic_noise
 )
