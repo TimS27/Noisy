@@ -21,10 +21,10 @@ fs = 1 / sample_interval  # Sampling frequency in Hz
 time = np.arange(record_length) * sample_interval  # Time array in seconds
 
 # Reading CSV file
-data1 = pd.read_csv("RIN-osci-noise-eater-off.csv")
-data2 = pd.read_csv("RIN-osci-noise-eater-on.csv")
-data_esa1 = pd.read_csv("RIN-ESA-noise-eater-off-20MHz-1s.csv")
-data_esa2 = pd.read_csv("RIN-ESA-noise-eater-on-20MHz-1s.csv")
+data1 = pd.read_csv("RIN-data/RIN-osci-noise-eater-off.csv")
+data2 = pd.read_csv("RIN-data/RIN-osci-noise-eater-on.csv")
+data_esa1 = pd.read_csv("RIN-data/RIN-ESA-noise-eater-off-20MHz-1s.csv")
+data_esa2 = pd.read_csv("RIN-data/RIN-ESA-noise-eater-on-20MHz-1s.csv")
  
 # Converting column data to list then array
 #time = np.array(data['time'].tolist())
@@ -91,8 +91,8 @@ plt.plot(freqencies_esa2, rin_dB_per_HZ_esa2, label="RIN noise eater on (ESA)")
 plt.axhline(shot_noise_dBHz, color='r', linestyle='--', label="Shot Noise Limit")
 plt.axhline(electronic_power_spectral_density_dBHz, color='purple', linestyle='--', label="NEP")
 plt.axvline(psd_max1, color='black', linestyle='--', label=r'$f_{relaxation-oscillations}$')
-#plt.text(1e4, rin_dB_per_Hz1[1] + 1, "noise eater off", color='tab:blue')
-#plt.text(1e4, rin_dB_per_Hz2[1] - 3, "noise eater on", color='tab:orange')
+plt.text(1e4, rin_dB_per_Hz1[1] + 1, "noise eater off", color='tab:blue')
+plt.text(1e4, rin_dB_per_Hz2[1] - 3, "noise eater on", color='tab:orange')
 plt.text(2e5, -110, r'$f_{relaxation-oscillations}$')
 plt.text(2e4, shot_noise_dBHz + 1, 'shot noise', color='red')
 plt.text(2e4, electronic_power_spectral_density_dBHz + 1, 'NEP', color='purple')
