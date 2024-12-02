@@ -82,6 +82,9 @@ shot_noise_dBHz = 10 * np.log10(shot_noise_linear)
 psd_max1 = frequencies1[np.argmax(psd1)]
 psd_max2 = frequencies2[np.argmax(psd2)]
 
+# Save data from FFT analysis to plot e.g. with simulation
+np.savetxt('rin.csv', [p for p in zip(frequencies1[1:], rin_dB_per_Hz1[1:])], delimiter=',', fmt='%s')
+
 # Plot the RIN curve
 plt.figure(figsize=(10, 6))
 plt.plot(frequencies1[1:], rin_dB_per_Hz1[1:], label="RIN noise eater off (Osci)")

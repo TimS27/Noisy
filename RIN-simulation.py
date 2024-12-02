@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.constants as const
 import matplotlib.pyplot as plt
-#from scipy.signal import lfilter
+import pandas as pd
 
 ###################### Simulating Time Domain Data ########################
 
@@ -15,23 +15,23 @@ time = np.linspace(0, T, N, endpoint=False)  # Time vector
 
 # Laser parameters
 laser_wavelength = 1064e-9  # [nm]
-P_avg = 230e-3  # Mean optical power (230 mW) [J/s], for 1s energy equals average power in Joules
+P_avg = 500e-3  # Mean optical power (230 mW) [J/s], for 1s energy equals average power in Joules
 photon_energy = const.h * const.c / laser_wavelength    # [J]
 avg_photon_number = P_avg / photon_energy  # [1/s]
 #relative_fluctuation_amplitude = 0.01  # Relative fluctuation amplitude (1% of mean power)
 
 # Photodiode parameters
-R = 1 # Photodetector responsivity [A/W]
+R = 0.5 # Photodetector responsivity [A/W]
 r = 50  # [Ohm]
 
 # Relaxation oscillation parameters
-f_ro = 650e3  # Relaxation oscillation frequency (approx. 150 kHz for Nd:YAG)
-damping_factor = 3e4  # Damping factor for oscillations
-relaxation_amplitude = 1e-8  # Amplitude of relaxation oscillations
+f_ro = 800e3  # Relaxation oscillation frequency (approx. 150 kHz for Nd:YAG)
+damping_factor = 1e3  # Damping factor for oscillations
+relaxation_amplitude = 3e-8  # Amplitude of relaxation oscillations
 num_bursts = 200  # Number of random bursts
 
 # Noise contributions
-white_noise_amplitude = 1000  # Amplitude of white noise
+white_noise_amplitude = 1e3  # Amplitude of white noise
 flicker_noise_amplitude = 1e-5  # Amplitude of 1/f noise
 shot_noise_amplitude = np.sqrt((2 * const.eV * P_avg * delta_f) / R)
 
@@ -146,34 +146,51 @@ plt.grid()
 plt.show()
 '''
 
+##################### Read measured results for comparison ##################
+
+# Reading CSV file
+data1 = pd.read_csv("rin.csv")
+ 
+# Converting column data to list then array
+frequency = np.array(data1['frequency'].tolist())
+dBHz = np.array(data1['dBHz'].tolist())
+
+
 ###################### Plotting ########################
 
-plt.figure(figsize=(15, 5))
+plt.figure(figsize=(20, 6))
 
 # Plot the time-domain signal
 plt.subplot(1, 2, 1)
-plt.plot(time[:100000], intensity_signal[:100000])  # Plot a short segment for clarity
+plt.plot(time[:100000], intensity_signal[:100000], linewidth=.5)  # Plot a short segment for clarity
 plt.xlabel("Time [s]")
 plt.ylabel("Intensity [W]")
-plt.title("Simulated Laser Intensity with Relaxation Oscillations")
+plt.title("Simulated Time-Domain Laser Intensity")
 plt.grid()
 
 # Plot RIN
 plt.subplot(1, 2, 2)
-plt.plot(freqs[1:len(freqs)//2], rin[1:len(rin)//2])  # Plot positive frequencies only
+plt.plot(freqs[1:len(freqs)//2], rin[1:len(rin)//2], label='RIN simulated', linewidth=.5)  # Plot positive frequencies only
+plt.plot(frequency, dBHz, label='RIN measured (Osci)')  # Plot positive frequencies only
 plt.xscale('log')
 plt.xlim(left=1e4, right=1e7)
-plt.ylim(-180, -80)
-plt.hlines(shot_noise_dBcHz, 0, 2.5e6, color="orange", linestyle="--")
-plt.hlines(electronic_power_spectral_density_dBHz, 0, 2.5e6, color="red", linestyle="--")
-plt.vlines(650e3, -180, -80, color="green", linestyle="--", label="relaxation oscillation frequency")
+plt.ylim(-185, -105)
+#plt.hlines(shot_noise_dBcHz, 0, 1e7, color="orange", linestyle="--")
+#plt.hlines(electronic_power_spectral_density_dBHz, 0, 1e7, color="red", linestyle="--")
+plt.axhline(shot_noise_dBcHz, color='r', linestyle='--', label="Shot Noise Limit")
+plt.axhline(electronic_power_spectral_density_dBHz, color='purple', linestyle='--', label="NEP")
+plt.text(2e4, shot_noise_dBcHz + 1, 'shot noise', color='red')
+plt.text(2e4, electronic_power_spectral_density_dBHz + 1, 'NEP', color='purple')
+plt.text(2e5, -110, r'$f_{relaxation-oscillations}$')
+plt.vlines(650e3, -185, -80, color="green", linestyle="--", label="Relaxation oscillation frequency")
 plt.text(660e3, -90, r'$f_{relaxation-oscillations}$') #verticalalignment='center')
-plt.text(0.25e6, -170, 'shot noise') #verticalalignment='center')
-plt.text(0.5e6, -140, 'NEP') #verticalalignment='center')
+#plt.text(0.25e6, -170, 'shot noise') #verticalalignment='center')
+#plt.text(0.5e6, -140, 'NEP') #verticalalignment='center')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('RIN [dBc/Hz]')
 plt.title('Relative Intensity Noise (RIN)')
-plt.grid()
+plt.grid(which="both", linestyle="--", linewidth=0.5)
+plt.legend()
 
 #plt.tight_layout()
 plt.show()
