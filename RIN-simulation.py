@@ -15,6 +15,7 @@ time = np.linspace(0, T, N, endpoint=False)  # Time vector
 
 # Laser parameters
 laser_wavelength = 1064e-9  # [nm]
+######## 7mW!!!!! ########
 P_avg = 500e-3  # Mean optical power (230 mW) [J/s], for 1s energy equals average power in Joules
 photon_energy = const.h * const.c / laser_wavelength    # [J]
 avg_photon_number = P_avg / photon_energy  # [1/s]

@@ -25,7 +25,8 @@ data1 = pd.read_csv("RIN-data/RIN-osci-noise-eater-off.csv")
 data2 = pd.read_csv("RIN-data/RIN-osci-noise-eater-on.csv")
 data_esa1 = pd.read_csv("RIN-data/RIN-ESA-noise-eater-off-20MHz-1s.csv")
 data_esa2 = pd.read_csv("RIN-data/RIN-ESA-noise-eater-on-20MHz-1s.csv")
- 
+data = pd.read_csv("14102024-DANL-with-photodiode-on-blocked-1MHz-RBW.csv") # Photodiode dark noise
+
 # Converting column data to list then array
 #time = np.array(data['time'].tolist())
 voltage1 = np.array(data1['voltage'].tolist())
