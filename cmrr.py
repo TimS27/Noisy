@@ -33,12 +33,18 @@ def compute_cmrr(psd_unbalanced, psd_balanced):
     cmrr = psd_unbalanced - psd_balanced
     return cmrr
 
+
+################# Load data #################
 # Load data
-file_unbalanced = "balanced-detector-data/Koheron/koheron-det1-chopped-300Hz-rin-highres-100kSs-5MS.csv"
-file_balanced = "balanced-detector-data/Koheron/koheron-balanced-chopped-300Hz-rin-highres-100kSs-5MS.csv"
+""" file_unbalanced = "balanced-detector-data/Koheron/koheron-det1-chopped-800Hz-rin-highres-100kSs-5MS.csv"
+file_balanced = "balanced-detector-data/Koheron/koheron-balanced-chopped-800Hz-rin-highres-100kSs-5MS.csv" """
+
+file_unbalanced = "balanced-detector-data/Koheron/koheron-det1-chopped-800Hz-rin-highres-100kSs-5MS.csv"
+file_balanced = "balanced-detector-data/Koheron/koheron-balanced-chopped-800Hz-rin-highres-100kSs-5MS.csv"
+
 #file_balanced_unchopped = "balanced-detector-data/Koheron/koheron-balanced-rin-highres-2MSs-20MS.csv"
 file_dark_noise = "balanced-detector-data/Koheron/koheron-dark-noise-100kSs-1MS.csv"
-file_osci_noise = "osci-data/osci-dark-noise-100kSs-5MS.csv"
+file_osci_noise = "osci-data/osci-dark-noise-100kSs-1MS.csv"
 
 time_unbal, voltage_unbal = load_data(file_unbalanced)["time"].values, load_data(file_unbalanced)["voltage"].values
 time_bal, voltage_bal = load_data(file_balanced)["time"].values, load_data(file_balanced)["voltage"].values
@@ -83,44 +89,29 @@ for j in np.linspace(1, len(time_data_det1)-1, len(time_data_det1)-1, dtype=int)
 # Compute CMRR
 #print(compute_cmrr(psd_unbal[np.argmax(psd_unbal)], psd_bal[np.argmax(psd_unbal)]))
 #cmrr = compute_cmrr(psd_unbal, psd_bal)
-
-# Find
 freq_cmrr = [100, 200, 300, 400]
 result_cmrr = np.max(freq_data_balanced[1:], axis=1) - np.max(freq_data_det1[1:], axis=1)
 print(result_cmrr)
 #a[np.argmax(a)]-b[np.argmax(b)]
 #print(a[np.argmax(a)]-b[np.argmax(b)])
 #for i in np.linspace(0,4,5):
-#    result_cmrr.append(compute_cmrr(i[np.argmax(i)], (b[i])[np.argmax(b[i])]))
+#    result_cmrr.append(compute_cmrr(i[np.argmax(i)], (b[i])[np.argmax(b[i])])) """
 
 
-time_combi, voltage_100Hz, voltage_200Hz, voltage_300Hz, voltage_400Hz = load_data(file_combi_balanced)["time"].values, load_data(file_combi_balanced)["100Hz"].values, load_data(file_combi_balanced)["200Hz"].values, load_data(file_combi_balanced)["300Hz"].values, load_data(file_combi_balanced)["400Hz"].values
-freq_combi, psd_voltage_100Hz_balanced = compute_psd(time_combi, voltage_100Hz, fs=1e5)
-freq_combi, psd_voltage_200Hz_balanced = compute_psd(time_combi, voltage_200Hz, fs=1e5)
-freq_combi, psd_voltage_300Hz_balanced = compute_psd(time_combi, voltage_300Hz, fs=1e5)
-freq_combi, psd_voltage_400Hz_balanced = compute_psd(time_combi, voltage_400Hz, fs=1e5)
-a = [freq_combi, psd_voltage_100Hz_balanced, psd_voltage_200Hz_balanced, psd_voltage_300Hz_balanced, psd_voltage_400Hz_balanced]
-
-time_combi_det1, voltage_det1_100Hz, voltage_det1_200Hz, voltage_det1_300Hz, voltage_det1_400Hz = load_data(file_combi_det1)["time"].values, load_data(file_combi_det1)["100Hz"].values, load_data(file_combi_det1)["200Hz"].values, load_data(file_combi_det1)["300Hz"].values, load_data(file_combi_det1)["400Hz"].values
-freq_combi_det1, psd_voltage_100Hz_det1 = compute_psd(time_combi_det1, voltage_det1_100Hz, fs=1e5)
-freq_combi_det1, psd_voltage_200Hz_det1 = compute_psd(time_combi_det1, voltage_det1_200Hz, fs=1e5)
-freq_combi_det1, psd_voltage_300Hz_det1 = compute_psd(time_combi_det1, voltage_det1_300Hz, fs=1e5)
-freq_combi_det1, psd_voltage_400Hz_det1 = compute_psd(time_combi_det1, voltage_det1_400Hz, fs=1e5)
-b = [freq_combi_det1, psd_voltage_100Hz_det1, psd_voltage_200Hz_det1, psd_voltage_300Hz_det1, psd_voltage_400Hz_det1] """
-
-
+""" shot_noise_photons = np.sqrt(photons)
+shot_noise_current = constants.elementary_charge*shot_noise_photons
+shot_noise_voltage = shot_noise_current*Rf
+shot_noise_dBHz = 20 * np.log10(shot_noise_voltage) """
 
 # Calculate shot noise level
-r = 0.7  # Responsivity in A/W
+r = 0.65  # Responsivity in A/W
 laser_wavelength = 1064e-9
-Rf =39e3  # Transimpedance gain in ohms (example value)
-P_avg = 66.3e-6
+Rf =39e3  # Transimpedance gain in ohms
+P_avg = 100e-6
 nu = constants.c / laser_wavelength
 photons = P_avg/(constants.h*nu)
 current = P_avg * r
-
-shot_noise_photons = np.sqrt(photons)
-shot_noise_current = constants.elementary_charge*shot_noise_photons
+shot_noise_current = np.sqrt(2 * constants.elementary_charge * current)
 shot_noise_voltage = shot_noise_current*Rf
 # Compute shot noise in dB/Hz
 shot_noise_dBHz = 20 * np.log10(shot_noise_voltage)
@@ -131,30 +122,32 @@ shot_noise_dBHz = 20 * np.log10(shot_noise_voltage)
 #shot_noise_voltage = shot_noise * Rf
 
 
-""" # Plot CMRRs
-plt.figure(figsize=(10, 6))
-plt.semilogx(freq_cmrr, result_cmrr, label="CMRR")
-plt.xlim(10,1000)
-plt.xlabel("Frequency (Hz)")
-plt.ylabel("CMRR (dB)")
-plt.title("CMRR at different chopping frequencies")
-plt.legend()
-plt.grid(True)
-plt.show() """
-
-
+############## Plotting #################
 # Plot PSDs
 plt.figure(figsize=(10, 6))
-plt.semilogx(freq_unbal, psd_unbal, label="Unbalanced (Single Detector) 100 kHz")
-plt.semilogx(freq_bal, psd_bal, label="Balanced (Difference) 100 kHz")
+plt.semilogx(freq_unbal, psd_unbal, label="Unbalanced (Single Detector) 800 Hz")
+plt.semilogx(freq_bal, psd_bal, label="Balanced (Difference) 800 Hz")
 #plt.semilogx(freq_bal_unchopped, psd_bal_unchopped, label="Balanced (Difference) unchopped")
 plt.semilogx(freq_dark, psd_dark, label="Detector Dark Noise")
 plt.semilogx(freq_osci, psd_osci, label="System Noise Floor")
 plt.xlim(10,5e4)
-plt.axhline(shot_noise_dBHz, color='r', linestyle='--', label="Shot Noise Limit")
+#plt.axhline(shot_noise_dBHz, color='r', linestyle='--', label="Shot Noise Limit")
 plt.xlabel("Frequency (Hz)")
 plt.ylabel("Power Spectral Density (dB/Hz)")
 plt.title("PSD of Unbalanced vs. Balanced Detection")
 plt.legend()
 plt.grid(True)
 plt.show()
+
+""" # Plot CMRRs
+plt.figure(figsize=(10, 6))
+plt.semilogx(freq_cmrr, result_cmrr, label="CMRR")
+plt.xlim(10,1000)
+plt.xlabel("Frequency (Hz)")
+plt.ylabel("CMRR (dB)")
+plt.ylim(-38,-32)
+plt.xlim(-1e9,1e3)
+plt.title("CMRR at different chopping frequencies")
+plt.legend()
+plt.grid(True)
+plt.show() """

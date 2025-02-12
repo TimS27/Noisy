@@ -65,7 +65,7 @@ def plot_rin(freq_data):#, dark_noise_dB, osc_noise_dB):
     ax1.semilogx(freq_data[0], freq_data[1], label='Detector 1', linewidth=0.5)
     ax1.semilogx(freq_data[0], freq_data[3], label='Detector 2', linewidth=0.5)
     ax1.semilogx(freq_data[0], freq_data[5], label='Balanced unchopped', linewidth=0.5)
-    #ax1.semilogx(freq_data[0], freq_data[7], label='Balanced chopped 3kHz', linewidth=0.5, alpha= 0.1)
+    #ax1.semilogx(freq_data[0], freq_data[7], label='Balanced chopped 3kHz', linewidth=0.5, alpha= 0.3)
     ax1.semilogx(freq_data[0], freq_data[9], label='Balanced chopped 3kHz lockin', linewidth=0.5)
     ax1.semilogx(freq_data[0], freq_data[11], label='Osci', linewidth=0.5)
     ax1.semilogx(freq_data[0], freq_data[13], label='Detector dark noise', linewidth=0.5)
@@ -101,6 +101,8 @@ if __name__ == "__main__":
     file_det1 = "balanced-detector-data/Koheron/10-02-2025/koheron-det1-unchopped-2,5V-noise-100kSs-1MS.csv"
     file_det2 = "balanced-detector-data/Koheron/10-02-2025/koheron-det2-unchopped-2,5V-noise-100kSs-1MS.csv"
     file_balanced = "balanced-detector-data/Koheron/10-02-2025/koheron-balanced-unchopped-ca126microW-noise-100kSs-1MS.csv"
+    """ file_balanced_chopped = "balanced-detector-data/Koheron/10-02-2025/koheron-balanced-modulated-3kHz-ca126microW-noise-100kSs-1MS.csv"
+    file_balanced_chopped_lockin = "balanced-detector-data/Koheron/10-02-2025/koheron-balanced-modulated-3kHz-ca126microW-lockin-10000xgain-noise-100kSs-1MS.csv" """
     file_balanced_chopped = "balanced-detector-data/Koheron/10-02-2025/koheron-balanced-chopped-3kHz-ca126microW-noise-100kSs-1MS.csv"
     file_balanced_chopped_lockin = "balanced-detector-data/Koheron/10-02-2025/koheron-balanced-chopped-3kHz-ca126microW-lockin-1000xgain-noise-100kSs-1MS.csv"
     file_osci = "osci-data/osci-dark-noise-100kSs-1MS.csv"
