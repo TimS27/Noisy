@@ -19,10 +19,10 @@ df.to_csv("E:/Measurements/46/2025-02-28/nirvana-bal-194microW-20MS-100s-200kSs-
 #################################################
 
 # Load CSV data
-data = np.genfromtxt("E:/Measurements/46/2025-03-13/nirvana-dark.csv", delimiter=",", skip_header=21)
+data = np.genfromtxt("E:/Measurements/46/2025-03-14/bal-800-2.csv", delimiter=",", skip_header=21)
 
 # Save as NumPy binary
-np.save("E:/Measurements/46/2025-03-13/nirvana-dark.npy", data)
+np.save("E:/Measurements/46/2025-03-14/bal-800-2.npy", data)
 
 #################################################
 
