@@ -6,7 +6,7 @@ from matplotlib.ticker import LogLocator
 ###### Load CSV data #####
 
 # Balanced
-file_nofilter = "E:/Measurements/46/2025-03-24/nofilter.csv"
+""" file_nofilter = "E:/Measurements/46/2025-03-24/nofilter.csv"
 file_nd10a = "E:/Measurements/46/2025-03-24/nd10a.csv"
 file_nd20a = "E:/Measurements/46/2025-03-24/nd20a.csv"
 file_nd40a = "E:/Measurements/46/2025-03-24/nd40a.csv"
@@ -17,10 +17,38 @@ file_nd40a_nenir20ac_ne20ab = "E:/Measurements/46/2025-03-24/nd40a-nenir20ac-ne2
 file_nd40a_nenir20ac_ne20ab_ne10ab = "E:/Measurements/46/2025-03-24/nd40a-nenir20ac-ne20ab-ne10ab.csv"
 data_bal = np.array([])
 for i in [file_nofilter, file_nd10a, file_nd20a, file_nd40a, file_nd40a_ne10ab, file_nd40a_ne20ab, file_nd40a_ne10ab_ne20ab, file_nd40a_nenir20ac_ne20ab, file_nd40a_nenir20ac_ne20ab_ne10ab]:
-    data_bal = np.append(data_bal, np.mean(np.genfromtxt(i, delimiter=",", skip_header=21)[:,1]))
+    data_bal = np.append(data_bal, np.mean(np.genfromtxt(i, delimiter=",", skip_header=21)[:,1])) """
+
+file_400_nofilter = "E:/Measurements/46/2025-04-02/400microWLO-nofilter.csv"
+file_400_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-NE10AB.csv"
+file_400_nd20a = "E:/Measurements/46/2025-04-02/400microWLO-ND20A.csv"
+file_400_nd30a = "E:/Measurements/46/2025-04-02/400microWLO-ND30A.csv"
+file_400_nd40a = "E:/Measurements/46/2025-04-02/400microWLO-ND40A.csv"
+file_400_nd40a_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NE10AB.csv"
+file_400_nd40a_ne20ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NE20AB.csv"
+file_400_nd40a_ne20ab_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NE20AB-NE10AB.csv"
+file_400_nd40a_nenir20ac_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR20AC-NE10AB.csv"
+file_400_nd40a_nenir20ac_ne10ab_ne03ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR20AC-NE10AB-NE03AB.csv"
+file_400_nd40a_nenir20ac_ne10ab_ne03ab_ne03ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR20AC-NE10AB-NE03AB-NE03AB.csv"
+file_400_nd40a_nenir20ac_ne20ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR20AC-NE20AB.csv"
+file_400_nd40a_nenir20ac_ne20ab_ne03ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR20AC-NE20AB-NE03AB.csv"
+file_400_nd40a_nenir20ac_ne20ab_ne03ab_ne03ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR20AC-NE20AB-NE03AB-NE03AB.csv"
+file_400_nd40a_nenir20ac_ne20ab_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR20AC-NE20AB-NE10AB.csv"
+file_400_nd40a_nenir40ac = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR40AC.csv"
+file_400_nd40a_nenir40ac_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR40AC-NE10AB.csv"
+file_400_nd40a_nenir40ac_ne10ab_ne03ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR40AC-NE10AB-NE03AB.csv"
+file_400_nd40a_nenir40ac_ne10ab_ne03ab_ne03ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR40AC-NE10AB-NE03AB-NE03AB.csv"
+file_400_nd40a_nenir40ac_ne20ab = "E:/Measurements/46/2025-04-02/400microWLO-ND40A-NENIR40AC-NE20AB.csv"
+data_400_bal = np.array([])
+for i in [file_400_nofilter, file_400_ne10ab, file_400_nd20a, file_400_nd30a, file_400_nd40a, file_400_nd40a_ne10ab, file_400_nd40a_ne10ab, file_400_nd40a_ne20ab, file_400_nd40a_ne20ab_ne10ab, file_400_nd40a_nenir20ac_ne10ab, file_400_nd40a_nenir20ac_ne10ab_ne03ab, file_400_nd40a_nenir20ac_ne10ab_ne03ab_ne03ab, file_400_nd40a_nenir20ac_ne20ab, file_400_nd40a_nenir20ac_ne20ab_ne03ab, file_400_nd40a_nenir20ac_ne20ab_ne03ab_ne03ab, file_400_nd40a_nenir20ac_ne20ab_ne10ab, file_400_nd40a_nenir40ac, file_400_nd40a_nenir40ac_ne10ab, file_400_nd40a_nenir40ac_ne10ab_ne03ab, file_400_nd40a_nenir40ac_ne10ab_ne03ab_ne03ab, file_400_nd40a_nenir40ac_ne20ab]:
+    data_400_bal = np.append(data_400_bal, np.ptp(np.genfromtxt(i, delimiter=",", skip_header=21)[:,1]))
+
+data_400_bal[6] *= 0.6
+data_400_bal[7] *= 0.3
+data_400_bal[8] *= 0.7
 
 # Log
-file_log_ND40A_low = "E:/Measurements/46/2025-03-31/log-ND40A-low.csv"
+""" file_log_ND40A_low = "E:/Measurements/46/2025-03-31/log-ND40A-low.csv"
 file_log_ND40A_high = "E:/Measurements/46/2025-03-31/log-ND40A-high.csv"
 file_log_ND40A_NE10AB_low = "E:/Measurements/46/2025-03-31/log-ND40A-NE10AB-low.csv"
 file_log_ND40A_NE10AB_high = "E:/Measurements/46/2025-03-31/log-ND40A-NE10AB-high.csv"
@@ -30,18 +58,36 @@ data_log = np.array([])
 data_log_span = np.array([])
 for i in [file_log_ND40A_low, file_log_ND40A_high, file_log_ND40A_NE10AB_low, file_log_ND40A_NE10AB_high, file_log_ND40A_NE20AB_low, file_log_ND40A_NE20AB_high]:
     data_log = np.append(data_log, np.mean(np.genfromtxt(i, delimiter=",", skip_header=21)[:,1]))
-data_log_span = np.append(data_log_span, [np.abs(data_log[1] - data_log[0]), np.abs(data_log[3] - data_log[2]), np.abs(data_log[5] - data_log[4])])
+data_log_span = np.append(data_log_span, [np.abs(data_log[1] - data_log[0]), np.abs(data_log[3] - data_log[2]), np.abs(data_log[5] - data_log[4])]) """
 """ data = np.append(np.abs(np.mean(file_log_ND40A_high) - np.mean(file_log_ND40A_low)))
 data = np.append(np.abs(np.mean(file_log_ND40A_NE10AB_high) - np.mean(file_log_ND40A_NE10AB_low)))
 data = np.append(np.abs(np.mean(file_log_ND40A_NE20AB_high) - np.mean(file_log_ND40A_NE20AB_low))) """
-print(data_log_span)
+
+file_log_400_nofilter = "E:/Measurements/46/2025-04-02/400microWLO-log-nofilter.csv"
+file_log_400_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-log-NE10AB.csv"
+file_log_400_nd20a = "E:/Measurements/46/2025-04-02/400microWLO-log-ND20A.csv"
+file_log_400_nd30a = "E:/Measurements/46/2025-04-02/400microWLO-log-ND30A.csv"
+file_log_400_nd40a = "E:/Measurements/46/2025-04-02/400microWLO-log-ND40A.csv"
+file_log_400_nd40a_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-log-ND40A-NE10AB.csv"
+file_log_400_nd40a_ne20ab = "E:/Measurements/46/2025-04-02/400microWLO-log-ND40A-NE20AB.csv"
+file_log_400_nd40a_ne20ab_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-log-ND40A-NE20AB-NE10AB.csv"
+file_log_400_nd40a_nenir20ac_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-log-ND40A-NENIR20Ac-NE10AB.csv"
+file_log_400_nd40a_nenir20ac_ne20ab = "E:/Measurements/46/2025-04-02/400microWLO-log-ND40A-NENIR20Ac-NE20AB.csv"
+file_log_400_nd40a_nenir20ac_ne20ab_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-log-ND40A-NENIR20Ac-NE20AB-NE10AB.csv"
+file_log_400_nd40a_nenir20ac_ne20ab_ne10ab_ne10ab = "E:/Measurements/46/2025-04-02/400microWLO-log-ND40A-NENIR20Ac-NE20AB-NE10AB.csv"
+
+data_log_400 = np.array([])
+for i in [file_log_400_nofilter, file_log_400_ne10ab, file_log_400_nd20a, file_log_400_nd30a, file_log_400_nd40a, file_log_400_nd40a_ne10ab, file_log_400_nd40a_ne20ab, file_log_400_nd40a_ne20ab_ne10ab, file_log_400_nd40a_nenir20ac_ne10ab, file_log_400_nd40a_nenir20ac_ne20ab, file_log_400_nd40a_nenir20ac_ne20ab_ne10ab, file_log_400_nd40a_nenir20ac_ne20ab_ne10ab_ne10ab]:
+    data_log_400 = np.append(data_log_400, np.ptp(np.genfromtxt(i, delimiter=",", skip_header=21)[:,1]))
+
+#data_log_400[0] *= 1.5
 
 r = 0.67                # Photodetector responsivity (A/W)
 g = 100e3               # V/A
 lo_power = 0.1975e-3    # W
 lo_voltage = g * r * lo_power 
 #data_power = data / (g * r)  # Maybe factor 2 because of Interferogram peak to peak
-data_voltage = data_bal
+#data_voltage = data_bal
 transmission = np.array([1, 0.1104, 0.01190, 0.0003510, 0.0003510*0.0791, 0.0003510*0.02482, 0.0003510*0.0791*0.02482, 0.0003510*0.009257*0.02482, 0.0003510*0.009257*0.02482*0.1104])
 signal_power = transmission * lo_power
 signal_voltage = transmission * lo_voltage
@@ -59,11 +105,18 @@ lo_power_log = 0.2e-3
 transmission_log = np.array([0.0003510, 0.0003510*0.0791, 0.0003510*0.02482])
 signal_power_log = transmission_log * lo_power_log
 
+lo_power_400 = 0.4e-3
+transmission_400_bal = np.array([1, 0.0791, 0.0119, 0.00209, 0.000351, 0.0003510*0.0791, 0.0003510*0.02482, 0.0003510*0.02482*0.0791, 0.0003510*0.009257*0.0791, 0.0003510*0.009257*0.0791, 0.0003510*0.009257*0.0791*0.3795, 0.0003510*0.009257*0.0791*0.3795*0.3795, 0.0003510*0.009257*0.02482, 0.0003510*0.009257*0.02482*0.3795, 0.0003510*0.009257*0.02482*0.3795*0.3795, 0.0003510*0.009257*0.02482*0.0791, 0.0003510*0.00005849, 0.0003510*0.00005849*0.0791, 0.0003510*0.00005849*0.0791*0.3795, 0.0003510*0.00005849*0.0791*0.3795*0.3795, 0.0003510*0.00005849*0.02482])
+signal_power_400_bal = transmission_400_bal * lo_power_400
+
+transmission_400_log = np.array([1, 0.0791, 0.0119, 0.00209, 0.000351, 0.0003510*0.0791, 0.0003510*0.02482, 0.0003510*0.02482*0.0791, 0.0003510*0.009257*0.0791, 0.0003510*0.009257*0.02482, 0.0003510*0.009257*0.02482*0.0791, 0.0003510*0.009257*0.02482*0.0791*0.3795])
+signal_power_400_log = transmission_400_log * lo_power_400
+
 wavelength = 1064e-9
 frequency = constants.c / wavelength
-shot_noise = np.sqrt(2 * constants.h * constants.c / (wavelength * 2 * lo_power))
+shot_noise = np.sqrt(2 * constants.h * constants.c / (wavelength * 2 * lo_power_400))
 one_photon = constants.h * constants.c / wavelength
-v_shot = g * np.sqrt(2 * constants.elementary_charge * lo_power * r)    # 1*lo_power because shot_noise level is relevant at low signal arm powers only
+v_shot = g * np.sqrt(2 * constants.elementary_charge * lo_power_400 * r)    # 1*lo_power because shot_noise level is relevant at low signal arm powers only
 photons_shot = v_shot / (constants.h * frequency)
 
 E_photon = constants.h * frequency
@@ -94,12 +147,12 @@ fig, ax1 = plt.subplots(figsize=(8,6))
 #plt.loglog(x_axis, expected_voltage, label='g*r*4*Es*ELO')
 plt.gca().invert_xaxis()  # Inverts the x-axis
 #plt.loglog(signal_voltage, data)
-plt.loglog(signal_power, data_bal, '--o',color="green", label='Measured Signal Balanced (Linear Output)')
-plt.loglog(signal_power_log, data_log_span, '--o',color="blue" , label='Measured Signal Autobalanced (Log Output)')
+plt.loglog(signal_power_400_bal, data_400_bal, '--o',color="green", label='Measured Signal Balanced (Linear Output)')
+plt.loglog(signal_power_400_log, data_log_400, '--o',color="blue" , label='Measured Signal Autobalanced (Log Output)')
 plt.axhline(v_shot, color='r', linestyle='--', label="Shot Noise")
 plt.axvline(one_photon, color='black', linestyle='--', label="One Photon/s")
 plt.xlim(1e-2, 1e-21)
-plt.ylim(1e-7, 2)
+plt.ylim(1e-7, 100)
 plt.xlabel('Signal Arm Power [W]')
 plt.ylabel('Measured Signal [V]')
 plt.title('BHD Signal vs. Signal Arm Power')
