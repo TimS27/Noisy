@@ -95,7 +95,7 @@ signal_voltage = transmission * lo_voltage
 x_axis = np.linspace(10, 1e-20, 10000)#[::-1]  # Reverse the array
 x_axis_voltage = x_axis * g * r
 expected = 4 * np.sqrt(x_axis) * np.sqrt(lo_power) #/ (constants.epsilon_0 * constants.c)
-expected_voltage = g * r * expected
+expected_voltage = g * r * expected * 0.18
 #theory = 4 * x_axis * lo_voltage
 #theory = 4 * x_axis * lo_voltage
 #print(4 * np.sqrt(2e-4) * np.sqrt(2e-4))
@@ -124,6 +124,10 @@ E_photon = constants.h * frequency
 def power_to_photons(P):
     return P / E_photon
 
+""" # Fit for filter series curve to see interception point
+slope, intercept = np.polyfit(signal_power_400_bal[:10], data_400_bal[:10], 1)
+y_fit = slope * x_axis + intercept """
+
 #print(theory)
 # Plot the results
 #plt.semilogy(frequencies, psd_balanced_400_sqrt, label='Balanced 400 mW')
@@ -144,7 +148,8 @@ plt.show() """
 #plt.figure(figsize=(10, 6))
 fig, ax1 = plt.subplots(figsize=(8,6))
 #plt.loglog(x_axis_voltage, expected_voltage)
-#plt.loglog(x_axis, expected_voltage, label='g*r*4*Es*ELO')
+plt.loglog(x_axis, expected_voltage, label='g*r*4*Es*ELO')
+#plt.loglog(x_axis, y_fit, label="Balanced Fit")
 plt.gca().invert_xaxis()  # Inverts the x-axis
 #plt.loglog(signal_voltage, data)
 plt.loglog(signal_power_400_bal, data_400_bal, '--o',color="green", label='Measured Signal Balanced (Linear Output)')
@@ -156,9 +161,10 @@ plt.ylim(1e-7, 100)
 plt.xlabel('Signal Arm Power [W]')
 plt.ylabel('Measured Signal [V]')
 plt.title('BHD Signal vs. Signal Arm Power')
-plt.legend(loc='lower left', bbox_to_anchor=(0,0.2))
+plt.legend(loc='lower left', bbox_to_anchor=(0,0.15))
 ax1.xaxis.grid(visible=True, which='both')
 ax1.yaxis.grid(visible=True, which='major')
+ax1.axvspan(signal_power_400_bal[0], signal_power_400_bal[13], alpha=0.1, color='green')
 
 ax2 = ax1.secondary_xaxis("top", functions=(power_to_photons, lambda N: N * E_photon))  # transform function and its inverse
 ax2.set_xlabel("Signal Arm [Photons/s]")
