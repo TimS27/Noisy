@@ -187,7 +187,6 @@ file_bal_400_nd40a_nenir40ac_ne03ab = "E:/Measurements/46/2025-05-05/bhd-bal-400
 file_bal_400_nd40a_nenir40ac_ne10ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-ne10ab.csv"
 file_bal_400_nd40a_nenir40ac_ne10ab_ne03ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-ne10ab-ne03ab.csv"
 file_bal_400_nd40a_nenir40ac_ne20ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-ne20ab.csv"
-file_bal_400_nd40a_nenir40ac_ne20ab_ne03ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-nenir20ac-ne03ab.csv"
 file_bal_400_nd40a_nenir40ac_nenir20ac = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-nenir20ac.csv"
 file_bal_400_nd40a_nenir40ac_nenir20ac_ne03ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-nenir20ac-ne03ab.csv"
 
@@ -208,7 +207,6 @@ for i in [file_bal_400_ne03ab,
           file_bal_400_nd40a_nenir40ac_ne10ab,
           file_bal_400_nd40a_nenir40ac_ne10ab_ne03ab,
           file_bal_400_nd40a_nenir40ac_ne20ab,
-          file_bal_400_nd40a_nenir40ac_ne20ab_ne03ab,
           file_bal_400_nd40a_nenir40ac_nenir20ac,
           file_bal_400_nd40a_nenir40ac_nenir20ac_ne03ab
           ]:
@@ -230,31 +228,29 @@ transmission_400_bal = np.array([ne03ab,
                                  nd40a*nenir40ac*ne10ab,
                                  nd40a*nenir40ac*ne10ab*ne03ab,
                                  nd40a*nenir40ac*ne20ab,
-                                 nd40a*nenir40ac*ne20ab*ne03ab,
                                  nd40a*nenir40ac*nenir20ac,
                                  nd40a*nenir40ac*nenir20ac*ne03ab
                                  ])
 
-file_autobal_400_ne03ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-ne03ab.csv"
-file_autobal_400_ne10ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-ne10ab.csv"
-file_autobal_400_ne20a = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-ne20ab.csv"
-file_autobal_400_nd30a = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd30ab.csv"
-file_autobal_400_nd40a = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab.csv"
-file_autobal_400_nd40a_ne10ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-ne10ab.csv"
-file_autobal_400_nd40a_ne20ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-ne20ab.csv"
-file_autobal_400_nd40a_nenir20ac = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir20ac.csv"
-file_autobal_400_nd40a_nenir20ac_ne10ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir20ac-ne10ab.csv"
-file_autobal_400_nd40a_nenir20ac_ne20ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir20ac-ne20ab.csv"
-file_autobal_400_nd40a_nenir20ac_ne20ab_ne10ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir20ac-ne20ab-ne10ab.csv"
-file_autobal_400_nd40a_nenir40ac = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-2.csv"
-file_autobal_400_nd40a_nenir40ac_ne03ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-ne03ab.csv"
-file_autobal_400_nd40a_nenir40ac_ne10ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-ne10ab.csv"
-file_autobal_400_nd40a_nenir40ac_ne10ab_ne03ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-ne10ab-ne03ab.csv"
-file_autobal_400_nd40a_nenir40ac_ne20ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-ne20ab.csv"
-file_autobal_400_nd40a_nenir40ac_ne20ab_ne03ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-nenir20ac-ne03ab.csv"
-file_autobal_400_nd40a_nenir40ac_nenir20ac = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-nenir20ac.csv"
-file_autobal_400_nd40a_nenir40ac_nenir20ac_ne03ab = "E:/Measurements/46/2025-05-05/bhd-bal-400microW-LO-nd40ab-nenir40ac-nenir20ac-ne03ab.csv"
-# change peths here to autobal file
+file_autobal_400_ne03ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-ne03ab.csv"
+file_autobal_400_ne10ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-ne10ab.csv"
+file_autobal_400_ne20a = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-ne20ab.csv"
+file_autobal_400_nd30a = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd30ab.csv"
+file_autobal_400_nd40a = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab.csv"
+file_autobal_400_nd40a_ne10ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-ne10ab.csv"
+file_autobal_400_nd40a_ne20ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-ne20ab.csv"
+file_autobal_400_nd40a_nenir20ac = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-nenir20ac.csv"
+file_autobal_400_nd40a_nenir20ac_ne10ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-nenir20ac-ne10ab.csv"
+file_autobal_400_nd40a_nenir20ac_ne20ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-nenir20ac-ne20ab.csv"
+file_autobal_400_nd40a_nenir20ac_ne20ab_ne10ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-nenir20ac-ne20ab-ne10ab.csv"
+file_autobal_400_nd40a_nenir40ac = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-nenir40ac-2.csv"
+file_autobal_400_nd40a_nenir40ac_ne03ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-nenir40ac-ne03ab.csv"
+file_autobal_400_nd40a_nenir40ac_ne10ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-nenir40ac-ne10ab.csv"
+file_autobal_400_nd40a_nenir40ac_ne10ab_ne03ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-nenir40ac-ne10ab-ne03ab.csv"
+file_autobal_400_nd40a_nenir40ac_ne20ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-nenir40ac-ne20ab.csv"
+file_autobal_400_nd40a_nenir40ac_nenir20ac = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-nenir40ac-nenir20ac.csv"
+file_autobal_400_nd40a_nenir40ac_nenir20ac_ne03ab = "E:/Measurements/46/2025-05-05/bhd-autobal-400microW-LO-nd40ab-nenir40ac-nenir20ac-ne03ab.csv"
+
 data_autobal_400 = np.array([])
 for i in [file_autobal_400_ne03ab,
           file_autobal_400_ne10ab,
@@ -272,7 +268,6 @@ for i in [file_autobal_400_ne03ab,
           file_autobal_400_nd40a_nenir40ac_ne10ab,
           file_autobal_400_nd40a_nenir40ac_ne10ab_ne03ab,
           file_autobal_400_nd40a_nenir40ac_ne20ab,
-          file_autobal_400_nd40a_nenir40ac_ne20ab_ne03ab,
           file_autobal_400_nd40a_nenir40ac_nenir20ac,
           file_autobal_400_nd40a_nenir40ac_nenir20ac_ne03ab
           ]:
@@ -294,7 +289,6 @@ transmission_400_autobal = np.array([ne03ab,
                                  nd40a*nenir40ac*ne10ab,
                                  nd40a*nenir40ac*ne10ab*ne03ab,
                                  nd40a*nenir40ac*ne20ab,
-                                 nd40a*nenir40ac*ne20ab*ne03ab,
                                  nd40a*nenir40ac*nenir20ac,
                                  nd40a*nenir40ac*nenir20ac*ne03ab
                                  ])
@@ -318,7 +312,7 @@ signal_voltage = transmission * lo_voltage
 x_axis = np.linspace(10, 1e-20, 10000)#[::-1]  # Reverse the array
 x_axis_voltage = x_axis * g * r
 expected = 4 * np.sqrt(x_axis) * np.sqrt(lo_power) #/ (constants.epsilon_0 * constants.c)
-expected_voltage = g * r * expected * 0.18
+expected_voltage = g * r * expected * 0.25
 #theory = 4 * x_axis * lo_voltage
 #theory = 4 * x_axis * lo_voltage
 #print(4 * np.sqrt(2e-4) * np.sqrt(2e-4))
@@ -390,8 +384,8 @@ plt.loglog(x_axis, expected_voltage, label='g*r*4*Es*ELO')
 #plt.loglog(x_axis, y_fit, label="Balanced Fit")
 plt.gca().invert_xaxis()  # Inverts the x-axis
 #plt.loglog(signal_voltage, data)
-plt.loglog(signal_power_400_bal, data_bal_400, '--o',color="green", label='Measured Signal Balanced (Linear Output)')
-plt.loglog(signal_power_400_autobal, data_autobal_400, '--o',color="blue" , label='Measured Signal Autobalanced (Log Output)')
+plt.loglog(signal_power_400_bal, data_bal_400, '--o',color="green", label='Measured Signal Balanced')# (Linear Output)')
+plt.loglog(signal_power_400_autobal, data_autobal_400, '--o',color="blue" , label='Measured Signal Autobalanced')# (Log Output)')
 plt.axhline(v_shot, color='r', linestyle='--', label="Shot Noise")
 plt.axvline(one_photon, color='black', linestyle='--', label="One Photon/s")
 plt.xlim(1e-2, 1e-21)
