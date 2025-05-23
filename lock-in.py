@@ -337,6 +337,7 @@ for file_name in glob.glob("E:\Measurements/46/2025-05-22/tim_onlyshot*.npz"):
 
 series = [0.013514934087822695, 0.0002877861220757857, 0.00013562762918902484, 0.00010961890634659422, 0.0001082965896049411]
 
+gain = 100e3
 lo_power = 500e-6
 transmission = np.array([nenir40ac, nenir40ac*nd40a, nenir40ac*nd40a*nenir20ac, nenir40ac*nd40a*nenir20ac*ne10ab, nenir40ac*nd40a*nenir20ac*ne20ab])
 signal_power = np.array(transmissions_simulated) * lo_power
@@ -346,6 +347,7 @@ signal_power = np.array(transmissions_simulated) * lo_power
 one_photon = constants.h * constants.c / wavelength
 number_photons_shot = 5 * 0.05 * lo_power / one_photon
 number_photons_shot_uncertainty = np.sqrt(number_photons_shot)
+v_shot_rms = np.sqrt(2*constants.elementary_charge * lo_power * r * (gain**2) * 125e3)
 
 E_photon = constants.h * constants.c/wavelength
 # Function to convert Power (W) to Photons per second
@@ -361,7 +363,7 @@ plt.gca().invert_xaxis()  # Inverts the x-axis
 plt.loglog(signal_power, series_simulated, '--o',color="green", label='Measured Signal Balanced')# (Linear Output)')
 #plt.loglog(a,b, '--o',color="green", label='test')# (Linear Output)')
 #plt.loglog(signal_power_400_autobal, data_autobal_400, '--o',color="blue" , label='Measured Signal Autobalanced')# (Log Output)')
-plt.axhline(v_shot, color='r', linestyle='--', label="Shot Noise")
+plt.axhline(v_shot_rms, color='r', linestyle='--', label="Shot Noise")
 plt.axvline(one_photon, color='black', linestyle='--', label="One Photon/s")
 plt.xlim(1e-2, 1e-21)
 plt.ylim(1e-7, 100)
