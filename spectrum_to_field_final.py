@@ -177,3 +177,4 @@ axs[1].text(0.05, 0.9, f"FWHM: {fwhm_duration2_fs:.1f} fs", transform=axs[1].tra
 plt.suptitle("Real Electric Field and Pulse Duration Comparison for FT-Limited pulses corresponding to Measured Spectra")
 plt.tight_layout()
 plt.show()
+#test
