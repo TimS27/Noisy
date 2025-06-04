@@ -177,23 +177,3 @@ axs[1].text(0.05, 0.9, f"FWHM: {fwhm_duration2_fs:.1f} fs", transform=axs[1].tra
 plt.suptitle("Real Electric Field and Pulse Duration Comparison for FT-Limited pulses corresponding to Measured Spectra")
 plt.tight_layout()
 plt.show()
-
-
-
-
-""" plt.figure(figsize=(10, 4))
-plt.plot(time * 1e15, np.real(time_signal_real_norm), label="Real Part of E(t) (normalized)", alpha=0.7)
-#plt.plot(time * 1e15, envelope, 'r', label="Raw Envelope (Hilbert)", linewidth=1)
-plt.plot(time * 1e15, envelope_smoothed_scaled, 'g', label="Envelope", linewidth=2)
-plt.axvline(fwhm_start * 1e15, color='b', linestyle='--', lw='0.8')#, label="FWHM start")
-plt.axvline(fwhm_end * 1e15, color='b', linestyle='--', lw='0.8')#, label="FWHM end")
-plt.fill_between(time * 1e15, -1.5, 1.5, 
-                  where=((time >= fwhm_start) & (time <= fwhm_end)), 
-                  color='b', alpha=0.15, label="FWHM duration")
-plt.xlabel("Time (fs)")
-plt.ylabel("Amplitude (a.u.)")
-plt.xlim(-200,200)
-plt.legend()
-plt.title("Fourier-Transform-Limited Time-Domain Pulse, Envelope, and FWHM")
-plt.tight_layout()
-plt.show() """
