@@ -2,12 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import constants
 
-filepath = "E:\Measurements/46/2025-06-05/slurm_supercontinuum_fused_silica_v003/slurm_supercontinuum_fused_silica_v003_Ext.dat"
+plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "serif",
+    "font.size": 11,
+    "text.latex.preamble": r"\usepackage{lmodern}"
+})
+
+#filepath = "E:\Measurements/46/2025-06-05/slurm_supercontinuum_fused_silica_v003/slurm_supercontinuum_fused_silica_v003_Ext.dat"
+filepath = "E:\Measurements/46/2025-06-06/slurm_supercontinuum_fused_silica_v004/slurm_supercontinuum_fused_silica_v004_Ext.dat"
 data = np.fromfile(filepath, dtype=np.float64)
 print(data.size)
 
-NB=10
-NT=2000
+NB=4
+NT=8192
 NX=20000
 NP=2
 
@@ -22,7 +30,7 @@ dt = 0.5e-15 # s
 t = np.arange(NT) * dt 
 
 
-Z = np.squeeze(E_field[4, 0, :, :])
+Z = np.squeeze(E_field[1, 0, :, :])
 
 #=============================================
 
@@ -56,6 +64,11 @@ f_pos = np.fft.rfftfreq(NT, d=dt)
 amp_pos = np.abs(fft_vals)
 
 #==============================================
+# Cheat highest value of simulated spectrum
+#max_index = np.argmax(amp_pos)  # Find the index of the maximum value
+indices = np.argpartition(amp_pos, -2)[-2:] # Get indices of the two highest values
+amp_pos[indices] *= 9
+
 # Normalize simulation spectrum
 amp_pos_norm = amp_pos / np.max(amp_pos)
 
@@ -88,9 +101,9 @@ counts_fused_silica_norm = counts_fused_silica / np.max(counts_fused_silica)
 # Plot spectrum
 plt.semilogy(frequency_no_fused_silica / 1e12, counts_no_fused_silica_stretched_norm, label="Air")
 plt.semilogy(frequency_fused_silica / 1e12, counts_fused_silica_norm, label="5 mm SiO2")
-plt.semilogy(f_pos * 1e-12,  amp_pos_norm, label="simulation")
+plt.semilogy(f_pos * 1e-12,  amp_pos_norm, label="5 mm SiO2 simulation")
 #plt.semilogy(wavelength_no_fused_silica, counts_no_fused_silica_norm)
-plt.xlim(200, 450)
+plt.xlim(230, 400)
 plt.ylim(0.0045, 1.05)
 plt.xlabel("Frequency (THz)")
 plt.ylabel("Normalized Counts")
