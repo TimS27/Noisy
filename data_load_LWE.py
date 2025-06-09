@@ -10,17 +10,25 @@ plt.rcParams.update({
 })
 
 #filepath = "E:\Measurements/46/2025-06-05/slurm_supercontinuum_fused_silica_v003/slurm_supercontinuum_fused_silica_v003_Ext.dat"
-filepath = "E:\Measurements/46/2025-06-06/slurm_supercontinuum_fused_silica_v004/slurm_supercontinuum_fused_silica_v004_Ext.dat"
-data = np.fromfile(filepath, dtype=np.float64)
-print(data.size)
+#filepath = "E:\Measurements/46/2025-06-06/slurm_supercontinuum_fused_silica_v004/slurm_supercontinuum_fused_silica_v004_Ext.dat"
+filepath = "C:/Users/TimS27/Documents/LWE-simulations/slurm_supercontinuum_fused_silica_350_500_v007/slurm_supercontinuum_fused_silica_750_950_v007_Ext.dat"
+#data = np.fromfile(filepath, dtype=np.float64)
+#print(data.size)
+
+# Create a memmap file (will be on disk instead of in RAM)
+shape = (1310720000,)
+dtype = np.float64
+large_data = np.memmap(filepath, dtype=dtype, mode='w+', shape=shape)
+
+#filename = 'large_array.dat'
 
 NB=4
 NT=8192
 NX=20000
 NP=2
 
-E_field = data.reshape((NB,NP,NX,NT)).astype(np.float32)
-del data
+E_field = large_data.reshape((NB,NP,NX,NT)).astype(np.float32)
+del large_data
 
 dX=0.1 # um
 
@@ -30,7 +38,7 @@ dt = 0.5e-15 # s
 t = np.arange(NT) * dt 
 
 
-Z = np.squeeze(E_field[1, 0, :, :])
+Z = np.squeeze(E_field[3, 0, :, :])
 
 #=============================================
 
@@ -66,15 +74,15 @@ amp_pos = np.abs(fft_vals)
 #==============================================
 # Cheat highest value of simulated spectrum
 #max_index = np.argmax(amp_pos)  # Find the index of the maximum value
-indices = np.argpartition(amp_pos, -2)[-2:] # Get indices of the two highest values
-amp_pos[indices] *= 9
+#indices = np.argpartition(amp_pos, -2)[-2:] # Get indices of the two highest values
+#amp_pos[indices] *= 9
 
 # Normalize simulation spectrum
 amp_pos_norm = amp_pos / np.max(amp_pos)
 
 #==============================================
 
-fused_silica = "E:\Older-Measurements/measurements-11-09-24/messreihe3/3-5mm-SiO2-spectrum-5.csv"
+""" fused_silica = "E:\Older-Measurements/measurements-11-09-24/messreihe3/3-5mm-SiO2-spectrum-5.csv"
 no_fused_silica = "E:\Older-Measurements/measurements-24-27-08/No_Fused_Silica_Spectrum_Data.csv"
 no_fused_silica_stretched = "E:\Older-Measurements/measurements-24-27-08/Stretched_No_Fused_Silica_Spectrum.csv"
 
@@ -96,11 +104,11 @@ counts_no_fused_silica_stretched_norm = counts_no_fused_silica_stretched / np.ma
 wavelength_fused_silica = data_fused_silica[:,0] / 1e9
 frequency_fused_silica = constants.c / wavelength_fused_silica
 counts_fused_silica = data_fused_silica[:,1]
-counts_fused_silica_norm = counts_fused_silica / np.max(counts_fused_silica)
+counts_fused_silica_norm = counts_fused_silica / np.max(counts_fused_silica) """
 
 # Plot spectrum
-plt.semilogy(frequency_no_fused_silica / 1e12, counts_no_fused_silica_stretched_norm, label="Air")
-plt.semilogy(frequency_fused_silica / 1e12, counts_fused_silica_norm, label="5 mm SiO2")
+#plt.semilogy(frequency_no_fused_silica / 1e12, counts_no_fused_silica_stretched_norm, label="Air")
+#plt.semilogy(frequency_fused_silica / 1e12, counts_fused_silica_norm, label="5 mm SiO2")
 plt.semilogy(f_pos * 1e-12,  amp_pos_norm, label="5 mm SiO2 simulation")
 #plt.semilogy(wavelength_no_fused_silica, counts_no_fused_silica_norm)
 plt.xlim(230, 400)

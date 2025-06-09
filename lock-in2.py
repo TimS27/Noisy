@@ -80,23 +80,26 @@ def plot_stft(data, sample_rate, data2=None):
     plt.xlabel('Time [sec]')
 
 def lockin(t, calibration, sig, sample_rate, omega_expected, wavelength):
-  # negative shift of frequency peak to 0
+  # shift the carrier frequency of calibration signal down to DC
   shift = np.exp(1j*omega_expected*t)
   calibration_shifted = calibration * shift.conj()
 
-  # lowpass
+  # lowpass to isolate the slowly-varying envelope
   cut_off_freq = omega_expected/(2*np.pi)/2
   sos = signal.butter(10, (cut_off_freq), 'lowpass', fs=sample_rate, output="sos")
   calibration_shifted_lowpass = signal.sosfiltfilt(sos, calibration_shifted)
 
+  # Shift the low-passed data back to the original frequency, reconstructing the “cleaned” calibration signal
   calibration_reconstructed = calibration_shifted_lowpass * shift
 
-  # normalize
+  # Normalize/smoothen clibraiton signal
+  # Unwrap the phase (removing jumps of 2π) and build a normalized calibration signal containing only the slowly varying phase drift (e.g., from scan nonlinearities), but preserving the carrier
   fast_oscillation = np.exp(1j*omega_expected*t)
   phase_slow = np.unwrap(np.angle(calibration_reconstructed/ fast_oscillation))
   calibration_normalized = np.exp(1j*phase_slow) * fast_oscillation
 
-  # scaling delay axis
+  # Scaling delay axis
+  # Map the time axis to optical delay in meters
   phase_fast = phase_slow + omega_expected * t
   n_oscillations = phase_fast / (2*np.pi)
   delay_axis = n_oscillations * wavelength / constants.c
@@ -107,6 +110,7 @@ def lockin(t, calibration, sig, sample_rate, omega_expected, wavelength):
   """ print(delay_axis_evenly)
   print(delay_axis) """
 
+  # Demodulate the signal in the delay domain by applying sine and cosine terms at the carrier frequency in delay units (spatial oscillations in delay, not in time)
   sig_i = sig_interp * np.sin(2*np.pi*constants.c/wavelength * delay_axis_evenly)
   sig_q = sig_interp * np.cos(2*np.pi*constants.c/wavelength * delay_axis_evenly)
 
@@ -139,13 +143,17 @@ def lockin(t, calibration, sig, sample_rate, omega_expected, wavelength):
   cut_off_freq = 2*np.pi*constants.c/wavelength/20
   sos = signal.butter(10, (cut_off_freq), 'lowpass', fs=1/(np.mean(np.diff(delay_axis_evenly))), output="sos")
   filter_reaction_time = cut_off_freq**-1
-  i0 = int( filter_reaction_time/np.mean(np.diff(delay_axis_evenly)) )
+  i0 = int( filter_reaction_time/np.mean(np.diff(delay_axis_evenly)) )  # Accounts for filter reaction time
+
+  # final complex result (for envelope amplitude and phase)
   sig_i_lowpass = signal.sosfiltfilt(sos, sig_i)
   sig_q_lowpass = signal.sosfiltfilt(sos, sig_q)
 
 
 #  sig_iq_lowpass = signal.sosfiltfilt(sos, sig_interp * (sin+i cos))
 #  (-i sig_iq_lowpass) * np.exp(...) = signal.sosfiltfilt(sos, sig_interp * (cos - i sin))
+
+  # physically reconstructed interferogram
   siginterp_reconstructed = 2*np.real( (-1j)*(sig_i_lowpass+1j*sig_q_lowpass)*np.exp(1j*2*np.pi*constants.c/wavelength*delay_axis_evenly) )
 
   if 0:
@@ -162,7 +170,7 @@ def lockin(t, calibration, sig, sample_rate, omega_expected, wavelength):
   result = sig_i_lowpass + 1j*sig_q_lowpass
   result_abs = np.abs(result)
   result_phase = np.angle(result)
-  #print(delay_axis.size, sig.size) # delay_axis_evenly ahs more values because we interpolated
+  #print(delay_axis.size, sig.size) # delay_axis_evenly has more values because we interpolated
   frequencies, spectrum = fourioso.transform(delay_axis_evenly, sig_interp)
   frequencies, spectrum1 = fourioso.transform(delay_axis_evenly, siginterp_reconstructed)
 
@@ -460,14 +468,20 @@ for file_name in filenames:
       plt.xlabel('Time [sec]')
       plt.show()
 
-    # Gets rid of data near the turning points of the scan
-    #def isolate_linear(t, calibration, sig):
-    # bandpass
+
+
+    #######################################################
+    # Preprocessing: Remove Turning Point Data
+    #######################################################
+    
+    # Bandpass to extract main frequency
     bandpass_freq = omega_expected / (2*np.pi) / 2
     bandwidth = bandpass_freq/2
     sos = signal.butter(10, (bandpass_freq-bandwidth/2, bandpass_freq+bandwidth/2), 'bandpass', fs=sample_rate, output="sos")
     sig_bandpass = signal.sosfiltfilt(sos, calibration)# sig)
     sig_bandpass_abs = np.abs(sig_bandpass)
+
+    # Low-pass to extract trigger envelope
     sos2 = signal.butter(10, (10), 'lowpass', fs=sample_rate, output="sos")
     #if slow:
     #  sos2 = signal.butter(10, (15), 'lowpass', fs=sample_rate, output="sos")
@@ -561,7 +575,7 @@ for file_name in filenames:
 
     #plt.plot(np.concatenate(t_no_turningpoints), np.concatenate(cal_no_turningpoints))
 
-
+    #######################################################################
 
     """ plt.figure()
     ax = plt.subplot(2,1,1)
