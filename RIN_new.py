@@ -24,7 +24,6 @@ def compute_rin(voltage, sampling_rate, responsivity, trans_gain, mean_power):#,
     #relative_intensity = fluctuations / mean_optical_power
     fluctuations = optical_power - mean_optical_power   # δP(t)
 
-
     # Power Spectral Density (PSD) using Welch’s method
     freqs, psd = welch(fluctuations, fs=sampling_rate, nperseg=100000)
     
@@ -49,6 +48,7 @@ def compute_oscilloscope_noise(voltage_noise, sampling_rate, responsivity, trans
     mean_optical_power = mean_power / (responsivity * trans_gain)
     rin_oscilloscope = psd_p / (mean_optical_power ** 2)
 
+    #rin_oscilloscope = psd_v / mean_power**2
     # Convert to dB/Hz
     rin_oscilloscope_dB = 10 * np.log10(rin_oscilloscope + 1e-20)
 
@@ -57,9 +57,17 @@ def compute_oscilloscope_noise(voltage_noise, sampling_rate, responsivity, trans
 
     return freqs, rin_oscilloscope_dB, integrated_rms_rin
 
+def compute_fosn(rin_dBHz, rin_shot_noise_dBHz):
+    factor = 10 ** (np.abs(rin_dBHz - rin_shot_noise_dBHz) / 10)
+    return np.abs(factor)
+
+def compute_cmrr(rin_unbalanced, rin_balanced):
+    cmrrs = np.abs(rin_unbalanced - rin_balanced)# / 10) ** 10
+    return cmrrs
+
 # Plot the RIN and noise spectrum
-def plot_rin(freq_data):#, dark_noise_dB, osc_noise_dB):
-    fig, (ax1, ax2) = plt.subplots(2, sharex=True, figsize=(10,8))
+def plot_rin(freq_data, fosn, cmrrs):#, dark_noise_dB, osc_noise_dB):
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, sharex=True, figsize=(10,8), gridspec_kw={'height_ratios': [2, 1, 1, 1]})
     #fig.suptitle('Laser RIN and Noise Contributions')
     #plt.figure(figsize=(10, 10))
     ax1.semilogx(freq_data[0], freq_data[1], label='Detector 1', linewidth=0.5)
@@ -69,9 +77,9 @@ def plot_rin(freq_data):#, dark_noise_dB, osc_noise_dB):
     ax1.semilogx(freq_data[0], freq_data[9], label='Balanced chopped 3kHz lockin', linewidth=0.5)
     ax1.semilogx(freq_data[0], freq_data[11], label='Osci', linewidth=0.5)
     ax1.semilogx(freq_data[0], freq_data[13], label='Detector dark noise', linewidth=0.5)
-    ax1.axhline(shot_noise_dBHz, color='r', linestyle='--', label="Shot Noise Limit")
+    ax1.axhline(rin_shot_dBHz, color='r', linestyle='--', label="Shot Noise Limit")
     ax1.axvline(3e3, color="black", linewidth= 0.7)
-    ax1.set_xlim(left=0, right=5e4)
+    ax1.set_xlim(left=0, right=100e3)
     ax1.xaxis.grid(visible=True, which='both')
     ax1.yaxis.grid(visible=True, which='major')
     ax1.set_ylabel('RIN (dB/Hz)')
@@ -90,6 +98,17 @@ def plot_rin(freq_data):#, dark_noise_dB, osc_noise_dB):
     ax2.set_ylabel('RMS RIN')
     ax2.set_xlabel('Frequency (Hz)')
     ax2.title.set_text('Root Mean Square Relative Intensity Noise')
+
+    ax3.plot(freq_data[0], fosn)
+    ax3.set_ylim(bottom=0, top=100000)
+    ax3.set_ylabel('Balancing Factor above Shot Noise')
+    ax3.set_xlabel('Frequency (Hz)')
+
+    ax4.plot(freq_data[0], cmrrs)
+    #ax3.set_ylim(bottom=0, top=10000)
+    ax4.set_ylabel('CMRR')
+    ax4.set_xlabel('Frequency (Hz)')
+
     plt.show()
 
 # Example usage
@@ -109,7 +128,6 @@ if __name__ == "__main__":
     file_dark_noise = "balanced-detector-data/Koheron/10-02-2025/koheron-dark-noise-100kSs-1MS.csv"
     time_data = []
     time_data.append(load_data(file_det1)['time'].values)
-    freq_data = []
     for i in [file_det1, file_det2, file_balanced, file_balanced_chopped, file_balanced_chopped_lockin, file_osci, file_dark_noise]:
         time_data.append(load_data(i)['voltage'].values)
 
@@ -127,30 +145,31 @@ if __name__ == "__main__":
     responsivity = 0.65
     trans_gain = 39e3
 
-    freq, rin, rms_rin = compute_rin(time_data[1], sampling_rate=100e3, responsivity=0.65, trans_gain=39e3, mean_power=None)#, mean_power=mean_power_det1)    #sampling_rate=2e6
+    freq_data = []
+    freq, rin, rms_rin = compute_rin(time_data[1], sampling_rate=200e3, responsivity=0.65, trans_gain=39e3, mean_power=None)#, mean_power=mean_power_det1)    #sampling_rate=2e6
     freq_data.append(freq)
     """ for j in np.linspace(1, len(time_data)-1, len(time_data)-1, dtype=int):
         freq, rin = compute_rin(time_data[j], sampling_rate=100e3, responsivity=0.65, trans_gain=39e3, mean_power=None)#, mean_power=mean_powers[j-1])
         freq_data.append(rin) """
-    freq, rin, rms_rin = compute_rin(time_data[1], sampling_rate=100e3, responsivity=0.65, trans_gain=39e3, mean_power=None) 
+    freq, rin, rms_rin = compute_rin(time_data[1], sampling_rate=200e3, responsivity=0.65, trans_gain=39e3, mean_power=None) 
     freq_data.append(rin)
     freq_data.append(rms_rin)
-    freq, rin, rms_rin = compute_rin(time_data[2], sampling_rate=100e3, responsivity=0.65, trans_gain=39e3, mean_power=None) 
+    freq, rin, rms_rin = compute_rin(time_data[2], sampling_rate=200e3, responsivity=0.65, trans_gain=39e3, mean_power=None) 
     freq_data.append(rin)
     freq_data.append(rms_rin)
-    freq, rin, rms_rin = compute_rin(time_data[3], sampling_rate=100e3, responsivity=0.65, trans_gain=39e3, mean_power=np.mean(time_data[1])) 
+    freq, rin, rms_rin = compute_rin(time_data[3], sampling_rate=200e3, responsivity=0.65, trans_gain=39e3, mean_power=np.mean(time_data[1])) 
     freq_data.append(rin)
     freq_data.append(rms_rin)
-    freq, rin, rms_rin = compute_rin(time_data[4], sampling_rate=100e3, responsivity=0.65, trans_gain=39e3, mean_power=np.mean(time_data[1])) 
+    freq, rin, rms_rin = compute_rin(time_data[4], sampling_rate=200e3, responsivity=0.65, trans_gain=39e3, mean_power=np.mean(time_data[1])) 
     freq_data.append(rin)
     freq_data.append(rms_rin)
-    freq, rin, rms_rin = compute_rin(time_data[5], sampling_rate=100e3, responsivity=0.65, trans_gain=39e3, mean_power=np.mean(time_data[1])) 
+    freq, rin, rms_rin = compute_rin(time_data[5], sampling_rate=200e3, responsivity=0.65, trans_gain=39e3, mean_power=np.mean(time_data[1])) 
     freq_data.append(rin)
     freq_data.append(rms_rin)
-    freq, rin, rms_rin = compute_oscilloscope_noise(time_data[6], sampling_rate=100e3, responsivity=0.65, trans_gain=39e3, mean_power=np.mean(time_data[1])) 
+    freq, rin, rms_rin = compute_oscilloscope_noise(time_data[6], sampling_rate=200e3, responsivity=0.65, trans_gain=39e3, mean_power=np.mean(time_data[1])) 
     freq_data.append(rin)
     freq_data.append(rms_rin)
-    freq, rin, rms_rin = compute_oscilloscope_noise(time_data[7], sampling_rate=100e3, responsivity=0.65, trans_gain=39e3, mean_power=np.mean(time_data[1])) 
+    freq, rin, rms_rin = compute_oscilloscope_noise(time_data[7], sampling_rate=200e3, responsivity=0.65, trans_gain=39e3, mean_power=np.mean(time_data[1])) 
     freq_data.append(rin)
     freq_data.append(rms_rin)
 
@@ -158,18 +177,25 @@ if __name__ == "__main__":
     r = 0.65  # Responsivity in A/W
     laser_wavelength = 1064e-9
     Rf =39e3  # Transimpedance gain in ohms
-    P_avg = 100e-6
+    P_avg = np.mean(time_data[1] / (responsivity * trans_gain))
+    I_avg = np.mean(time_data[1] / trans_gain)
+    #P_avg = 100e-6
     nu = constants.c / laser_wavelength
-    photons = P_avg/(constants.h*nu)
+    #photons = P_avg/(constants.h*nu)
     current = P_avg * r
 
     """ shot_noise_photons = np.sqrt(photons)
     shot_noise_current = constants.elementary_charge*shot_noise_photons """
-    shot_noise_current = np.sqrt(2 * constants.elementary_charge * current)
-    shot_noise_voltage = shot_noise_current*Rf
+    #shot_noise_current=np.sqrt(2 * constants.elementary_charge * current)
+    shot_noise_current = 2 * constants.elementary_charge * current  #np.sqrt(2 * constants.elementary_charge * current)
+    shot_noise_power = shot_noise_current * (trans_gain**2)
+    rin_shot = shot_noise_current / P_avg**2
+    #rin_shot_dBHz = 10 * np.log10(rin_shot)
+    rin_shot_dBHz = 10 * np.log10(2*constants.elementary_charge/I_avg)
+    """ shot_noise_voltage = shot_noise_current*Rf
     # Compute shot noise in dB/Hz
     shot_noise_dBHz = 20 * np.log10(shot_noise_voltage)
-
+ """
 
     """ laser_file = "oscilloscope_data.csv"  # Replace with actual file
     detector_dark_file = "detector_dark_noise.csv"  # Replace with actual file
@@ -189,5 +215,11 @@ if __name__ == "__main__":
     _, dark_noise_dB = compute_rin(time_detector, voltage_detector, sampling_rate, mean_power)
     _, osc_noise_dB = compute_rin(time_osc, voltage_osc, sampling_rate, mean_power) """
     
+    # Compute CMRRs
+    cmrrs = compute_cmrr(freq_data[1], freq_data[9])
+
+    # Compute factor above shot noise
+    fosn = compute_fosn(freq_data[9], rin_shot_dBHz)
+
     # Plot all curves
-    plot_rin(freq_data)
+    plot_rin(freq_data, fosn, cmrrs)

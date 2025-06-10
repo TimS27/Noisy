@@ -8,7 +8,8 @@ ne03ab = 0.37945067
 ne10ab = 0.0790946
 ne20ab = 0.024822
 nenir20ac = 0.0092574
-nenir40ac = 0.0000585
+nenir40ac = 0.0000
+585
 nenir240b = 0.0000478
 nenir260b = 0.00000017
 nd05a = 0.3382503
@@ -294,7 +295,8 @@ transmission_400_autobal = np.array([ne03ab,
                                  ])
 # end 05-05-2024
 
-
+a = [nenir40ac, nenir40ac*nd40a, nenir20ac]
+b = [0.021844028496636424, 0.0010439771620273082, 0.00043168214621558995]
 
 
 #data_log_400[0] *= 1.5
@@ -385,6 +387,7 @@ plt.loglog(x_axis, expected_voltage, label='g*r*4*Es*ELO')
 plt.gca().invert_xaxis()  # Inverts the x-axis
 #plt.loglog(signal_voltage, data)
 plt.loglog(signal_power_400_bal, data_bal_400, '--o',color="green", label='Measured Signal Balanced')# (Linear Output)')
+plt.loglog(a,b, '--o',color="green", label='test')# (Linear Output)')
 plt.loglog(signal_power_400_autobal, data_autobal_400, '--o',color="blue" , label='Measured Signal Autobalanced')# (Log Output)')
 plt.axhline(v_shot, color='r', linestyle='--', label="Shot Noise")
 plt.axvline(one_photon, color='black', linestyle='--', label="One Photon/s")

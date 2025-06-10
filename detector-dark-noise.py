@@ -11,13 +11,13 @@ def load_data(file_path):
     return data
 
 # Function to calculate the power in dBm
-def voltage_to_dbm(voltage, impedance=50):
+def voltage_to_dbm(voltage, impedance=10e6):
     power_watts = (voltage**2) / impedance  # Calculate power in watts
     power_dbm = 10 * np.log10(power_watts * 1e3)  # Convert to dBm
     return power_dbm
-
+'''
 # Perform FFT and calculate spectrum in dBm
-def calculate_spectrum(data, sampling_rate, impedance=50):
+def calculate_spectrum(data, sampling_rate, impedance=10e6):
     voltage = data["voltage"].values
     n = len(voltage)
 
@@ -32,7 +32,66 @@ def calculate_spectrum(data, sampling_rate, impedance=50):
     frequencies = np.fft.fftfreq(n, d=1/sampling_rate)[:n // 2]
 
     return frequencies, spectrum_dbm
+'''
+# Perform FFT and calculate spectrum in dBm/√Hz
+def calculate_spectrum_dbm_sqrt_hz(data, sampling_rate, impedance=10e6):
+    voltage = data["voltage"].values
+    n = len(voltage)
 
+    # Perform FFT
+    fft_values = fft(voltage)
+    fft_magnitude = np.abs(fft_values)[:n // 2]  # Single-sided spectrum
+
+    # Compute frequency resolution
+    freq_res = sampling_rate / n  # Bin width in Hz
+
+    # Convert FFT magnitude to voltage noise density in V/√Hz
+    voltage_noise_density = fft_magnitude / np.sqrt(n * freq_res)
+
+    # Convert to Power Spectral Density in W/√Hz
+    power_density_w_sqrt_hz = (voltage_noise_density ** 2) / impedance
+
+    # Convert to dBm/√Hz
+    spectrum_dbm_sqrt_hz = 10 * np.log10(power_density_w_sqrt_hz * 1e3)
+
+    # Frequency axis
+    frequencies = np.fft.fftfreq(n, d=1/sampling_rate)[:n // 2]
+
+    return frequencies, spectrum_dbm_sqrt_hz
+'''
+# Perform FFT and calculate spectrum in dBc/√Hz
+def calculate_spectrum_dbc_sqrt_hz(data, sampling_rate, carrier_freq=1000, impedance=10e6):
+    voltage = data["voltage"].values
+    n = len(voltage)
+
+    # Perform FFT
+    fft_values = fft(voltage)
+    fft_magnitude = np.abs(fft_values)[:n // 2]  # Single-sided spectrum
+
+    # Compute frequency resolution
+    freq_res = sampling_rate / n  # Bin width in Hz
+
+    # Convert FFT magnitude to voltage noise density in V/√Hz
+    voltage_noise_density = fft_magnitude / np.sqrt(n * freq_res)
+
+    # Convert to Power Spectral Density in W/√Hz
+    power_density_w_sqrt_hz = (voltage_noise_density ** 2) / impedance
+
+    # Convert to dBm/√Hz
+    spectrum_dbm_sqrt_hz = 10 * np.log10(power_density_w_sqrt_hz * 1e3)
+
+    # Frequency axis
+    frequencies = np.fft.fftfreq(n, d=1/sampling_rate)[:n // 2]
+
+    # Find the carrier frequency index
+    carrier_idx = np.argmin(np.abs(frequencies - carrier_freq))
+    carrier_power_dbm = spectrum_dbm_sqrt_hz[carrier_idx]  # Carrier Power
+
+    # Convert to dBc/√Hz (relative to carrier)
+    spectrum_dbc_sqrt_hz = spectrum_dbm_sqrt_hz - carrier_power_dbm
+
+    return frequencies, spectrum_dbc_sqrt_hz
+'''
 # Plot the spectrum
 def plot_spectrum(frequencies1, spectrum_dbm1, frequencies2, spectrum_dbm2):
     plt.figure(figsize=(10, 6))
@@ -41,7 +100,7 @@ def plot_spectrum(frequencies1, spectrum_dbm1, frequencies2, spectrum_dbm2):
     plt.title("Spectral Content in dBm")
     plt.xlabel("Frequency (Hz)")
     plt.ylabel("Power (dBm)")
-    plt.xlim(0,10e3)
+    plt.xlim(0,50e3)
     plt.grid()
     plt.legend()
     plt.show()
@@ -71,18 +130,18 @@ def main():
     #file_path2 = "balanced-detector-data/dark-noise/dark-noise-on-1s-10MS.csv"
     #sampling_rate1 = 10e6
     #sampling_rate2 = 10e6
-    file_path1 = "balanced-detector-data/balancing/input1-1s-10MS-5Vpp-5kHz-modulation.csv"
-    file_path2 = "balanced-detector-data/balancing/balanced-1s-10MS-5Vpp-5kHz-modulation.csv"
-    sampling_rate1 = 10e6
-    sampling_rate2 = 10e6
+    file_path1 = "balanced-detector-data/koheron/koheron-det1-chopped-800Hz-rin-highres-100kSs-5MS.csv"
+    file_path2 = "balanced-detector-data/koheron/koheron-balanced-chopped-800Hz-rin-highres-100kSs-5MS.csv"
+    sampling_rate1 = 100e3
+    sampling_rate2 = 100e3
 
     # Load data
     data1 = load_data(file_path1)
     data2 = load_data(file_path2)
 
     # Calculate spectrum
-    frequencies1, spectrum_dbm1 = calculate_spectrum(data1, sampling_rate1)
-    frequencies2, spectrum_dbm2 = calculate_spectrum(data2, sampling_rate2)
+    frequencies1, spectrum_dbm1 = calculate_spectrum_dbm_sqrt_hz(data1, sampling_rate1)
+    frequencies2, spectrum_dbm2 = calculate_spectrum_dbm_sqrt_hz(data2, sampling_rate2)
 
     # Plot spectrum
     plot_spectrum(frequencies1, spectrum_dbm1, frequencies2, spectrum_dbm2)

@@ -9,12 +9,12 @@ from scipy.interpolate import interp1d
 from scipy.signal.windows import tukey
 from scipy.fft import fft, ifft, fftshift, fftfreq
 
-plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "serif",
-    "font.size": 11,
-    "text.latex.preamble": r"\usepackage{lmodern}"
-})
+#plt.rcParams.update({
+#    "text.usetex": True,
+#    "font.family": "serif",
+#   "font.size": 11,
+#   "text.latex.preamble": r"\usepackage{lmodern}"
+#})
 
 font_size_label = 18
 font_size_title = 20
@@ -24,7 +24,7 @@ font_size_title = 20
 # Plotting final and initial spectrum
 #################################################
 
-""" fused_silica = "E:\Older-Measurements/measurements-11-09-24/messreihe3/3-5mm-SiO2-spectrum-5.csv"
+fused_silica = "E:\Older-Measurements/measurements-11-09-24/messreihe3/3-5mm-SiO2-spectrum-5.csv"
 no_fused_silica = "E:\Older-Measurements/measurements-24-27-08/No_Fused_Silica_Spectrum_Data.csv"
 no_fused_silica_stretched = "E:\Older-Measurements/measurements-24-27-08/Stretched_No_Fused_Silica_Spectrum.csv"
 
@@ -55,30 +55,31 @@ plt.xlabel("Wavelength (nm)")
 plt.ylabel("Normalized Counts")
 plt.title("Spectral Broadening in 5 mm Fused Silica")
 plt.legend(loc='upper left')
-plt.show() """
+plt.show()
 
 
 #################################################
 # Preparing FT-limited pulse corresponding to spectrum for simulations
 #################################################
 
-# === Load and Sort Spectrum ===
+""" # Load and Sort Spectrum
 no_fused_silica = "E:\Older-Measurements/measurements-24-27-08/No_Fused_Silica_Spectrum_Data.csv"
 df = pd.read_csv(no_fused_silica)
 wavelengths_nm = np.sort(df["Wavelength"].values)
 intensities = df["Counts"].values[np.argsort(df["Wavelength"].values)]
 
-# === Convert to Frequency Domain ===
+# Convert to Frequency Domain
 c = 3e8
 frequencies_Hz = c / (wavelengths_nm * 1e-9)
 
-# === Extend and Interpolate ===
-pad_fraction = 0.2
+# Extend and Interpolate
+pad_fraction = 1
 bandwidth = frequencies_Hz.max() - frequencies_Hz.min()
 f_min_ext = frequencies_Hz.min() - pad_fraction * bandwidth
 f_max_ext = frequencies_Hz.max() + pad_fraction * bandwidth
-num_points = 2**13  # half spectrum size
+num_points = 2**14  # half spectrum size
 freq_half = np.linspace(f_min_ext, f_max_ext, num_points)
+delta_f = (f_max_ext - f_min_ext) / (num_points - 1)    # Frequency resolution
 
 interp_func = interp1d(frequencies_Hz, intensities, kind='linear', bounds_error=False, fill_value=0)
 spectrum_half = interp_func(freq_half)
@@ -111,193 +112,220 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
-# === Construct Hermitian-Symmetric Spectrum ===
+
+# Number of points in the gap between pos. and neg. frequncies of spectrum
+# Don't know if this frequency axis leads to errors later on!
+gap_points = int(np.round((2*190e12) / delta_f))
+
+# Create zero array for the gap
+zero_gap = np.zeros(gap_points)
+
+# Construct Hermitian-Symmetric Spectrum with gap filled with zeros
 amp_half = np.sqrt(spectrum_half_windowed)
-# Build full symmetric spectrum: [negative frequencies | positive frequencies]
-amp_full = np.concatenate([
-    amp_half,                        # positive frequencies
-    np.conj(amp_half[::-1])         # negative frequencies
+amp_full_filled_gap = np.concatenate([
+    np.conj(amp_half[::-1]),  # negative frequencies (−440 THz to −190 THz)
+    zero_gap,                 # zero gap (−190 THz to +190 THz)
+    amp_half                  # positive frequencies (+190 THz to +440 THz)
 ])
 
-# === Time-Domain Electric Field ===
-E_time = fftshift(ifft(amp_full))
+# Physical lab-frame frequencies (your measured data range)
+freq_positive = freq_half  # from f_min_ext to f_max_ext
 
-""" # Shift electric field to lab frame
-E_time_shifted = E_time * np.exp(2j * np.pi * f0 * t) """
+# Negative frequencies mirror: -f_max_ext to -f_min_ext
+freq_negative = -freq_half[::-1]
 
-# === Time Axis ===
-dfreq = freq_half[1] - freq_half[0]
-N = len(amp_full)
-dt = 1 / (N * dfreq)
-t = np.linspace(-N/2, N/2 - 1, N) * dt
+# Concatenate to get the real physical axis
+freq_full_physical = np.concatenate([freq_negative, freq_positive])
 
-# === Plot: Spectrum ===
-freq_full = np.linspace(-1, 1, N) * (dfreq * N / 2)  # synthetic symmetric frequency axis for plotting
-#freq_full_symmetric = np.linspace(-f_max_ext, f_max_ext, N)
-#freq_bins = fftshift(fftfreq(N, d=dt))  # now centered on 0 Hz
-#f0 = np.sum(freq_half * spectrum_half_windowed) / np.sum(spectrum_half_windowed)    # center frequency ~290 THz
-#freq_full_lab = freq_bins + f0
+# Number of points for the full spectrum
+N_full = len(amp_full_filled_gap)
+
+# Build a full, uniformly spaced frequency axis with the same Δf
+freq_full_with_gap = np.linspace(
+    -freq_half[-1],     # −f_max_ext
+    freq_half[-1],      # +f_max_ext
+    N_full              # total number of points
+)
+
+
+
+# Check if zero_gap needs to be adjusted
+missing_points = len(freq_negative) + len(freq_positive)
+if missing_points < N_full:
+    zero_gap = np.zeros(N_full - missing_points)
+
+# Build final frequency axis
+freq_full_physical = np.concatenate([freq_negative, zero_gap * 0 + freq_negative[-1] + delta_f, freq_positive])
+
+# Build final spectrum (Hermitian-symmetric)
+amp_full_filled_gap = np.concatenate([np.conj(amp_half[::-1]), zero_gap, amp_half])
+
+# Create final uniform frequency grid
+freq_uniform = np.linspace(freq_full_physical.min(), freq_full_physical.max(), N_full)
+
+# Interpolate real and imaginary parts separately to this uniform grid
+amp_interp_real = interp1d(freq_full_physical, np.real(amp_full_filled_gap), kind='linear', fill_value=0, bounds_error=False)(freq_uniform)
+amp_interp_imag = interp1d(freq_full_physical, np.imag(amp_full_filled_gap), kind='linear', fill_value=0, bounds_error=False)(freq_uniform)
+
+# Combine to final complex spectrum for IFFT
+amp_full_uniform = amp_interp_real + 1j * amp_interp_imag
+
 plt.figure(figsize=(10, 4))
-plt.plot(np.fft.fftshift(freq_full * 1e-12), np.abs(amp_full)**2 / np.max(np.abs(amp_full)**2), label="Full Hermitian Spectrum")
-plt.xlabel("Frequency (THz)")
-plt.ylabel("Normalized Spectral Intensity")
-plt.title("Hermitian-Symmetric Spectrum")
-plt.tight_layout()
-plt.show()
-
-# === Plot: Time-Domain Electric Field ===
-plt.figure(figsize=(10, 4))
-plt.plot(t * 1e15, np.real(E_time), label="E(t)")
-plt.xlabel("Time (fs)")
-plt.ylabel("Electric Field (a.u.)")
-plt.title("Real Oscillating Electric Field")
-plt.tight_layout()
-plt.show()
-
-# === Forward FFT to reconstruct spectrum ===
-E_freq_reconstructed = fftshift(fft(E_time))
-spectrum_reconstructed = np.abs(E_freq_reconstructed)**2
-spectrum_reconstructed /= np.max(spectrum_reconstructed)
-
-# Extract frequency axis corresponding to fftshifted FFT
-df = freq_half[1] - freq_half[0]
-freq_full = np.linspace(-N/2, N/2 - 1, N) * df  # in Hz
-
-# Take positive half
-positive_freq_indices = freq_full >= 0
-freq_positive = freq_full[positive_freq_indices]
-spectrum_positive = spectrum_reconstructed[positive_freq_indices]
-
-# === Plot reconstructed vs original windowed spectrum ===
-plt.figure(figsize=(10, 4))
-plt.plot(freq_half * 1e-12, spectrum_half_windowed / np.max(spectrum_half_windowed), label="Original Spectrum (windowed)")
-plt.plot(freq_positive * 1e-12, spectrum_positive / np.max(spectrum_positive), '--', label="Reconstructed Spectrum (from E(t))")
+plt.plot(freq_uniform * 1e-12, np.abs(amp_full_uniform)**2 / np.max(np.abs(amp_full_uniform)**2), label="Prepared Spectrum")
 plt.xlabel("Frequency (THz)")
 plt.ylabel("Normalized Intensity")
-plt.title("Reconstructed Spectrum Check")
+plt.title("Final Prepared Hermitian-Symmetric Spectrum (for IFFT)")
 plt.legend()
 plt.tight_layout()
 plt.show()
 
-
-
-
-
-""" no_fused_silica = "E:\Older-Measurements/measurements-24-27-08/No_Fused_Silica_Spectrum_Data.csv"
-
-# Load spectrum from CSV
-df = pd.read_csv(no_fused_silica)
-
-# Extract data
-wavelengths_nm = df["Wavelength"].values
-intensities = df["Counts"].values
-
-# Sort in increasing wavelength (if not already sorted)
-sort_idx = np.argsort(wavelengths_nm)
-wavelengths_nm = wavelengths_nm[sort_idx]
-intensities = intensities[sort_idx]
-
-# Convert wavelength (nm) to frequency (Hz)
-c = 3e8  # speed of light in m/s
-frequencies_Hz = c / (wavelengths_nm * 1e-9)
-
-# Define extended frequency range
-bandwidth = frequencies_Hz.max() - frequencies_Hz.min()
-pad_fraction = 0.2  # 20% extra frequencies on both ends
-freq_min_ext = frequencies_Hz.min() - pad_fraction * bandwidth
-freq_max_ext = frequencies_Hz.max() + pad_fraction * bandwidth
-
-# Uniform extended frequency grid
-num_points = 2**14
-freq_uniform_ext = np.linspace(freq_min_ext, freq_max_ext, num_points)
-
-# Interpolate and extend with zeros at the edges
-interp_func_ext = interp1d(frequencies_Hz, intensities, kind='linear', bounds_error=False, fill_value=0)
-interp_spectrum_ext = interp_func_ext(freq_uniform_ext)
-
-
-# Identify significant region
-threshold = 0.001 * np.max(interp_spectrum_ext)  # 5% of max intensity
-signal_region = interp_spectrum_ext > threshold
-first_idx = np.argmax(signal_region)
-last_idx = len(signal_region) - np.argmax(signal_region[::-1])
-flat_length = last_idx - first_idx
-
-# Find the spectral peak index (center of window)
-peak_idx = np.argmax(interp_spectrum_ext)
-
-# Reduce flat region manually
-narrow_width = int(0.6 * flat_length)  # reduce length of window
-start_idx = max(0, peak_idx - narrow_width // 2)
-end_idx = min(len(interp_spectrum_ext), peak_idx + narrow_width // 2)
-window_length = end_idx - start_idx
-
-taper = tukey(window_length, alpha=0.9)  # sharper than alpha=0.6
-window = np.zeros_like(interp_spectrum_ext)
-window[start_idx:end_idx] = taper
-
-# Apply the window
-windowed_spectrum_ext = interp_spectrum_ext * window
-
-# Plot interpolated, extended and windowed spectrum
 plt.figure(figsize=(10, 4))
-plt.plot(freq_uniform_ext * 1e-12, interp_spectrum_ext, label="Extended Interpolated Spectrum")
-plt.plot(freq_uniform_ext * 1e-12, windowed_spectrum_ext, label="Windowed Extended Spectrum")
+plt.plot(freq_full_with_gap * 1e-12, np.abs(amp_full_filled_gap)**2 / np.max(np.abs(amp_full_filled_gap)**2))
 plt.xlabel("Frequency (THz)")
-plt.ylabel("Spectral Intensity (a.u.)")
-plt.title("Extended and Windowed Spectrum")
-plt.legend()
+plt.ylabel("Normalized Spectral Intensity")
+plt.title("Hermitian-Symmetric Spectrum with Zero-Filled Gap")
 plt.tight_layout()
 plt.show()
 
-# === Construct Hermitian-Symmetric Spectrum ===
-amp_half = np.sqrt(windowed_spectrum_ext)
-spectrum_hermitian = np.concatenate([
-    amp_half,
-    np.conj(amp_half[::-1])  # Complex conjugate of mirrored positive half
-])
 
-# === Inverse FFT to Time Domain ===
-E_time_real = fftshift(ifft(spectrum_hermitian))
+# Time-Domain Electric Field
+E_time = fftshift(ifft(amp_full_uniform))#filled_gap))
 
-# === Time Axis ===
-dfreq = freq_uniform_ext[1] - freq_uniform_ext[0]
-N = len(spectrum_hermitian)
-dt = 1 / (N * dfreq)
-t = np.linspace(-N/2, N/2 - 1, N) * dt  # Time in seconds
+dt = 1 / (N_full * delta_f)  # in seconds
+t = np.linspace(-N_full/2, N_full/2 - 1, N_full) * dt
 
-# Step 8: Plot Real Electric Field
+f0 = np.sum(freq_half * spectrum_half_windowed) / np.sum(spectrum_half_windowed)
+# Modulate the baseband pulse to the lab-frame center frequency
+E_time_lab = np.real(E_time * np.exp(2j * np.pi * f0 * t))
+# Use complex field for FFT
+E_time_lab_complex = E_time * np.exp(2j * np.pi * f0 * t)
+
+
+
+############## Exporting Electric field for LWE ##############
+# Convert time to fs
+#time_fs = t * 1e15
+
+# Two-column data: time (fs) and real part of the field
+data_to_save = np.column_stack((t, np.real(E_time_lab_complex)))
+
+# Save to ASCII file
+np.savetxt("E_time_real_field.asc", data_to_save, comments='')  # , header="time_fs  E_field_real"
+##########################################################
+
+
+
 plt.figure(figsize=(10, 4))
-plt.plot(t * 1e15, np.real(E_time_real)**2)
+plt.plot(t * 1e15, np.real(E_time_lab))  # time in fs
 plt.xlabel("Time (fs)")
 plt.ylabel("Electric Field (a.u.)")
-plt.title("Reconstructed Real Electric Field (Hermitian-Symmetric Spectrum)")
+plt.title("Fourier-Transform-Limited Time-Domain Electric Field")
+plt.tight_layout()
+plt.show()
+
+
+# === Time-Domain Electric Field (baseband) ===
+E_time = fftshift(ifft(amp_full_uniform))  # final spectrum → time domain
+
+# Time axis
+freq_range = freq_full_with_gap[-1] - freq_full_with_gap[0]
+dt = 1 / freq_range
+t = np.linspace(-N_full/2, N_full/2 - 1, N_full) * dt
+
+# Center frequency (lab frame)
+spectrum_power = np.abs(amp_full_uniform)**2
+f0 = np.sum(freq_full_with_gap * spectrum_power) / np.sum(spectrum_power)
+
+# Modulate to lab-frame center frequency
+E_time_lab_complex = E_time * np.exp(2j * np.pi * f0 * t)
+
+# Reconstructed spectrum (complex field)
+E_freq_lab_complex = fftshift(fft(E_time_lab_complex))
+spectrum_lab_complex = np.abs(E_freq_lab_complex)**2
+spectrum_lab_complex /= np.max(spectrum_lab_complex)
+
+# FFT frequency bins
+freq_bins = fftshift(fftfreq(N_full, d=dt))  # in Hz
+freq_lab_frame = freq_bins + f0              # physically shifted to lab frame
+
+# Plot final spectrum (jut shift manually for visualiztion, doesnt matter for simulations)
+plt.figure(figsize=(10, 4))
+plt.plot(freq_lab_frame * 1e-12, spectrum_lab_complex, '--', label="Reconstructed Spectrum (complex)")
+plt.plot(freq_full_with_gap * 1e-12, np.abs(amp_full_uniform)**2 / np.max(np.abs(amp_full_uniform)**2), label="Original Hermitian Spectrum")
+plt.axvline(f0 * 1e-12, color='r', linestyle='--', label=f"f0 = {f0*1e-12:.2f} THz")
+plt.xlabel("Frequency (THz)")
+plt.ylabel("Normalized Intensity")
+plt.title("Lab-frame Spectrum (Single Peaks at ±290 THz)")
+plt.legend()
 plt.tight_layout()
 plt.show() """
 
-#time_domain_centered = np.roll(time_domain, -np.argmax(np.abs(time_domain)))    # Optional: Center time-domain electric field before FFT
 
-""" # === Step 1: Forward Fourier transform (back to frequency domain) ===
-E_freq_reconstructed = fftshift(fft(E_time))
 
-# === Step 2: Compute spectral intensity ===
-S_reconstructed = np.abs(E_freq_reconstructed)**2
 
-# === Step 3: Normalize both spectra for comparison ===
-S_reconstructed /= np.max(S_reconstructed)
-windowed_spectrum_norm = windowed_spectrum_ext / np.max(windowed_spectrum_ext)
 
-# === Step 4: Plot comparison ===
+
+
+
+
+
+
+
+
+""" # === Time-Domain Electric Field (baseband) ===
+E_time = fftshift(ifft(amp_full_filled_gap))
+#dt = 1 / (N_full * delta_f)
+freq_range = freq_full_with_gap[-1] - freq_full_with_gap[0]
+dt = 1 / freq_range
+t = np.linspace(-N_full/2, N_full/2 - 1, N_full) * dt
+
+# Center frequency (lab frame)
+#f0 = np.sum(freq_half * spectrum_half_windowed) / np.sum(spectrum_half_windowed)
+spectrum_power = np.abs(amp_full_filled_gap)**2
+f0 = np.sum(freq_half * spectrum_half_windowed) / np.sum(spectrum_half_windowed)
+
+# Modulate to lab frame (complex field)
+E_time_lab_complex = E_time * np.exp(2j * np.pi * f0 * t)
+
+# Reconstructed spectrum (complex field)
+E_freq_lab_complex = fftshift(fft(E_time_lab_complex))
+spectrum_lab_complex = np.abs(E_freq_lab_complex)**2
+spectrum_lab_complex /= np.max(spectrum_lab_complex)
+
+# FFT frequency bins
+freq_bins = fftshift(fftfreq(N_full, d=dt))  # in Hz
+freq_lab_frame = freq_bins + f0              # physically shifted to lab frame
+
+# Plot (on correct frequency axis for each!)
 plt.figure(figsize=(10, 4))
-plt.plot(freq_uniform_ext * 1e-12, windowed_spectrum_norm, label="Original Windowed Spectrum")
-plt.plot(freq_uniform_ext * 1e-12, S_reconstructed, '--', label="Reconstructed via FFT")
+plt.plot(freq_lab_frame * 1e-12, spectrum_lab_complex, '--', label="Reconstructed Spectrum (complex)")
+plt.plot(freq_full_with_gap * 1e-12, np.abs(amp_full_filled_gap)**2 / np.max(np.abs(amp_full_filled_gap)**2), label="Original Hermitian Spectrum")
+plt.axvline(f0 * 1e-12, color='r', linestyle='--', label=f"f0 = {f0*1e-12:.2f} THz")
 plt.xlabel("Frequency (THz)")
-plt.ylabel("Normalized Spectral Intensity")
-plt.title("Spectrum Reconstruction via FFT")
+plt.ylabel("Normalized Intensity")
+plt.title("Lab-frame Spectrum (Single Peaks at ±290 THz)")
 plt.legend()
 plt.tight_layout()
-plt.show()
- """
+plt.show() """
+
+""" # Reconstruct Spectrum from Time-Domain Pulse: FFT of complex field → single-sided spectrum
+E_freq_lab_complex = fftshift(fft(E_time_lab_complex))
+spectrum_lab_complex = np.abs(E_freq_lab_complex)**2
+spectrum_lab_complex /= np.max(spectrum_lab_complex)
+
+freq_bins = fftshift(fftfreq(N_full, d=dt))  # in Hz, centered at 0
+freq_lab_frame = freq_bins + f0              # shift up to lab frame
+
+plt.figure(figsize=(10, 4))
+plt.plot(freq_lab_frame * 1e-12, spectrum_lab_complex / np.max(spectrum_lab_complex), '--', label="Reconstructed Spectrum (complex)")
+plt.plot(freq_full_with_gap * 1e-12, np.abs(amp_full_filled_gap)**2 / np.max(np.abs(amp_full_filled_gap)**2), label="Original Hermitian Spectrum")
+plt.xlabel("Frequency (THz)")
+plt.ylabel("Normalized Intensity")
+plt.title("Lab-frame Spectrum (Single Peaks at ±290 THz)")
+plt.legend()
+plt.tight_layout()
+plt.show() """
+
 
 
 #################################################

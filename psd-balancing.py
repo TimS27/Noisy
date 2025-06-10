@@ -65,13 +65,13 @@ file_osci = "E:/Measurements/46/2025-03-13/osci-dark.npy"
 file_signal = "E:/Measurements/46/2025-03-14/signalhalf-800microW.npy"
 file_signal_400 = "E:/Measurements/46/2025-03-14/signalhalf-400microW.npy" """
 
-file_balanced_400 = "E:/Measurements/46/2025-04-28/rin-400microW-LO-bal.npy"
+file_balanced_400 = "E:/Measurements/46/2025-04-29/rin-400microW-LO-bal-2.npy"
 file_autobalanced_400 = "E:/Measurements/46/2025-04-28/rin-800microW-LO-and-NE03AB-autobal.npy"
 file_balanced_800 = "E:/Measurements/46/2025-03-14/bal-800microW.npy"
 file_autobalanced_800 = "E:/Measurements/46/2025-03-14/autobal-800microW.npy"
 file_dark = "E:/Measurements/46/2025-03-14/nirvana-dark-noise.npy"
 file_osci = "E:/Measurements/46/2025-03-13/osci-dark.npy"
-file_signal = "E:/Measurements/46/2025-03-14/signalhalf-800microW.npy"
+file_signal = "E:/Measurements/46/2025-04-29/rin-400microW-LO-signal.npy"
 file_signal_400 = "E:/Measurements/46/2025-03-14/signalhalf-400microW.npy"
 
 # Read time data into one array

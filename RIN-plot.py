@@ -9,8 +9,8 @@ laser_wavelength = 1064e-9
 
 # Oscilloscope settings
 sample_interval = 1e-8  # Time between samples in seconds
-record_length = 100000  # Number of samples
-vertical_offset = 0.2124  # DC offset in volts
+record_length =100e3#100000  # Number of samples
+#vertical_offset = 1#0.2124  # DC offset in volts
 probe_attenuation = 1  # Probe attenuation factor
 
 # ESA settings
@@ -18,27 +18,27 @@ esa_RBW = 1e4   # [10 kHz]
 
 # Derived parameters
 fs = 1 / sample_interval  # Sampling frequency in Hz
-time = np.arange(record_length) * sample_interval  # Time array in seconds
+#time = np.arange(record_length) * sample_interval  # Time array in seconds
 
 # Reading CSV file
-data1 = pd.read_csv("RIN-data/RIN-osci-noise-eater-off.csv")
-data2 = pd.read_csv("RIN-data/RIN-osci-noise-eater-on.csv")
-data_esa1 = pd.read_csv("RIN-data/RIN-ESA-noise-eater-off-20MHz-1s.csv")
-data_esa2 = pd.read_csv("RIN-data/RIN-ESA-noise-eater-on-20MHz-1s.csv")
-data = pd.read_csv("14102024-DANL-with-photodiode-on-blocked-1MHz-RBW.csv") # Photodiode dark noise
+data1 = pd.read_csv("RIN-data\Mephisto\RIN-osci-noise-eater-off.csv")
+data2 = pd.read_csv("RIN-data\Mephisto\RIN-osci-noise-eater-on.csv")
+#data_esa1 = pd.read_csv("RIN-data/RIN-ESA-noise-eater-off-20MHz-1s.csv")
+#data_esa2 = pd.read_csv("RIN-data/RIN-ESA-noise-eater-on-20MHz-1s.csv")
+#data = pd.read_csv("14102024-DANL-with-photodiode-on-blocked-1MHz-RBW.csv") # Photodiode dark noise
 
 # Converting column data to list then array
 #time = np.array(data['time'].tolist())
 voltage1 = np.array(data1['voltage'].tolist())
 voltage2 = np.array(data2['voltage'].tolist())
-freqencies_esa1 = np.array(data_esa1['Hz'].tolist())
+""" freqencies_esa1 = np.array(data_esa1['Hz'].tolist())
 dBm_esa1 = np.array(data_esa1['dBm'].tolist())
 freqencies_esa2 = np.array(data_esa2['Hz'].tolist())
-dBm_esa2 = np.array(data_esa2['dBm'].tolist())
+dBm_esa2 = np.array(data_esa2['dBm'].tolist()) """
 
 # Remove DC offset
-signal1 = voltage1 - vertical_offset
-signal2 = voltage2 - vertical_offset
+signal1 = voltage1 - 0.2124#vertical_offset
+signal2 = voltage2 - 0.2124#vertical_offset
 
 # Calculate the power of the signal (mean square value)
 signal_power1 = np.mean(signal1**2)
@@ -52,15 +52,15 @@ frequencies1, psd1 = welch(signal1, fs=fs, nperseg=record_length // 10)
 frequencies2, psd2 = welch(signal2, fs=fs, nperseg=record_length // 10)
 
 # Convert PSD to RIN (relative intensity noise) in dB/Hz
-#rin_psd = psd / signal_power  # Normalize PSD by signal power
-#rin_dBc_per_Hz = 10 * np.log10(rin_psd)
-rin_dB_per_Hz1 = 10 * np.log10(psd1)
+rin_psd = psd1 / signal_power1**2  # Normalize PSD by signal power
+rin_dBc_per_Hz = 10 * np.log10(rin_psd)
+rin_dB_per_Hz1 = 10 * np.log10(rin_psd)
 rin_dB_per_Hz2 = 10 * np.log10(psd2)
 
-P_noise_lin_esa1 = 10 ** ((dBm_esa1 - 30) / 10)
+""" P_noise_lin_esa1 = 10 ** ((dBm_esa1 - 30) / 10)
 P_noise_lin_esa2 = 10 ** ((dBm_esa2 - 30) / 10)
 rin_dB_per_HZ_esa1 = 10 * np.log10(P_noise_lin_esa1 / (P_avg ** 2 * esa_RBW))
-rin_dB_per_HZ_esa2 = 10 * np.log10(P_noise_lin_esa2 / (P_avg ** 2 * esa_RBW))
+rin_dB_per_HZ_esa2 = 10 * np.log10(P_noise_lin_esa2 / (P_avg ** 2 * esa_RBW)) """
 
 # Calculate electronic_power_spectral_density_dBHz from NEP
 R = 0.5
@@ -90,8 +90,8 @@ np.savetxt('rin.csv', [p for p in zip(frequencies1[1:], rin_dB_per_Hz1[1:])], de
 plt.figure(figsize=(10, 6))
 plt.plot(frequencies1[1:], rin_dB_per_Hz1[1:], label="RIN noise eater off (Osci)")
 plt.plot(frequencies2[1:], rin_dB_per_Hz2[1:], label="RIN noise eater on (Osci)")
-plt.plot(freqencies_esa1, rin_dB_per_HZ_esa1, label="RIN noise eater off (ESA)")
-plt.plot(freqencies_esa2, rin_dB_per_HZ_esa2, label="RIN noise eater on (ESA)")
+#plt.plot(freqencies_esa1, rin_dB_per_HZ_esa1, label="RIN noise eater off (ESA)")
+#plt.plot(freqencies_esa2, rin_dB_per_HZ_esa2, label="RIN noise eater on (ESA)")
 plt.axhline(shot_noise_dBHz, color='r', linestyle='--', label="Shot Noise Limit")
 plt.axhline(electronic_power_spectral_density_dBHz, color='purple', linestyle='--', label="NEP")
 plt.axvline(psd_max1, color='black', linestyle='--', label=r'$f_{relaxation-oscillations}$')

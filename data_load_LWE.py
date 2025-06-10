@@ -14,8 +14,8 @@ filepath = "E:\Measurements/46/2025-06-06/slurm_supercontinuum_fused_silica_v004
 data = np.fromfile(filepath, dtype=np.float64)
 print(data.size)
 
-NB=4
-NT=8192
+NB=4    # batch size
+NT=8192 # Fourier number
 NX=20000
 NP=2
 
