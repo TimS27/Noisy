@@ -201,7 +201,8 @@ ne20ab = 0.024822
 ne10ab = 0.0790946
 nenir240b = 0.0000478
 nenir260b = 0.00000017
-transmissions = {
+transmissions = {"E:\Measurements/46/2025-06-05/BHD1.dat": 0}
+""" transmissions = {
   #"E:\\Measurements/46/2025-06-03-mod\\tek0000CH1.isf": 0,
   ############################ Files and transmissions from 2025-06-03 (1 mW LO) autobal
   "E:\\Measurements/46/2025-06-03-mod2\\tek0003CH1.isf": ne10ab,
@@ -243,7 +244,7 @@ transmissions = {
   "E:\\Measurements/46/2025-06-03-mod2\\tek0075CH1.isf": ne10ab*ne20ab*nenir40ac*nenir240b*nd40a,
   "E:\\Measurements/46/2025-06-03-mod2\\tek0077CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir240b*nd40a,
   ####################################################
-}
+} """
 
 ############### Files and transmissions from 2025-06-02
 """ "E:\\Measurements/46/2025-06-02-mod\\tek0000CH1.isf": 0,
@@ -343,8 +344,8 @@ def load_isf(filename):
   #inter_filename = "inter".join(filename.rsplit("delay", 1))
   inter_filename = filename.replace("CH1","CH2")
   data_inter, header_inter = isfread(inter_filename)
-  calibration = data_cal[1][0:750000]
-  sig = data_inter[1][0:750000]
+  calibration = data_cal[1]#[0:750000]
+  sig = data_inter[1]#[0:750000]
   if 0:
     plt.figure()
     plt.plot(sig[:10000])
@@ -356,6 +357,23 @@ def load_isf(filename):
     sys.exit()
   return transmissions[filename], sig, calibration,
 
+def load_dat(filename):
+  data = np.memmap(filename, dtype="<i2")
+  ch1 = data[0::4]
+  ch2 = data[1::4]
+  ch3 = data[2::4]
+  ch4 = data[3::4]
+  """ plt.subplot(4,1,1)
+  plt.plot(ch1[:1000000])
+  plt.subplot(4,1,2)
+  plt.plot(ch2[:1000000])
+  plt.subplot(4,1,3)
+  plt.plot(ch3[:1000000])
+  plt.subplot(4,1,4)
+  plt.plot(ch4[:1000000])
+  plt.show() """
+  return transmissions[filename], ch4[:100000000], ch2[:100000000],
+
 def load(filename):
   if filename.endswith(".npz"):
     data = np.load(file_name)    # diff, cal entries
@@ -364,12 +382,20 @@ def load(filename):
     return data["transmission"], sig, calibration
   elif filename.endswith(".isf"):
     return load_isf(filename)
+  elif filename.endswith(".dat"):
+    return load_dat(filename)
   else:
     raise Exception("invalid extension")
 
 #filenames = glob.glob("tim_onlyshot*.npz")
 #filenames = glob.glob("*-delay.isf")
-filenames = glob.glob("E:\Measurements/46/2025-06-03-mod2/tek*CH1.isf")#)"tek*CH1.isf")
+
+
+
+
+#filenames = glob.glob("E:\Measurements/46/2025-06-03-mod2/tek*CH1.isf")#)"tek*CH1.isf")
+filenames = glob.glob("E:\Measurements/46/2025-06-05/BHD1.dat")#)"tek*CH1.isf")
+
 
 #filenames = ["500microWLO-1,6V-delayPD-20MS-40s-nenir40ac-delay.isf"]
 #filenames = ["tek0013CH1.isf"]
@@ -434,7 +460,7 @@ for file_name in filenames:
     dt = sample_rate**-1
     wavelength = 1064e-9
 
-    t = np.arange(calibration.size)*dt
+    #t = np.arange(calibration.size)*dt
     #t = np.arange(data_cal[0][0:500000].size)*dt
     #calibration = data_cal[1][0:500000]
     #sig = data_inter[1][0:500000]
@@ -494,6 +520,7 @@ for file_name in filenames:
 
     sig_no_turningpoints = []
     t_no_turningpoints = []
+    t_starts = []
     cal_no_turningpoints = []
     while True:
         i_trigger = np.argmax(sig_trigger > threshold_triggerpoints)
@@ -557,21 +584,26 @@ for file_name in filenames:
 
         sig_no_turningpoints.append(sig[i_start:i_stop])
         sig = sig[i_start:]
-        t_no_turningpoints.append(t[i_start:i_stop])
-        t = t[i_start:]
+        #t_no_turningpoints.append(t[i_start:i_stop])
+        if len(t_starts) > 0:
+          t_starts.append(i_start*dt + t_starts[-1])
+        else:
+          t_starts.append(i_start*dt)
+        #t = t[i_start:]
         cal_no_turningpoints.append(calibration[i_start:i_stop])
         calibration = calibration[i_start:]
         sig_trigger = sig_trigger[i_start:]
         if(i_stop > sig.size):
             break
 
+        print(i_start)
     sig_no_turningpoints = sig_no_turningpoints[1:]
     t_no_turningpoints = t_no_turningpoints[1:]
     cal_no_turningpoints = cal_no_turningpoints[1:]
 
-    sig_no_turningpoints = sig_no_turningpoints[:1]
-    t_no_turningpoints = t_no_turningpoints[:1]
-    cal_no_turningpoints = cal_no_turningpoints[:1]
+    sig_no_turningpoints = sig_no_turningpoints[:-1]
+    t_no_turningpoints = t_no_turningpoints[:-1]
+    cal_no_turningpoints = cal_no_turningpoints[:-1]
 
     #plt.plot(np.concatenate(t_no_turningpoints), np.concatenate(cal_no_turningpoints))
 
@@ -606,7 +638,9 @@ for file_name in filenames:
     #result_abs = []
     result_abs_mean = []
     result_phase_mean = []
-    for t,cal,sig in zip(t_no_turningpoints, cal_no_turningpoints, sig_no_turningpoints):
+    for tstart,cal,sig in zip(t_starts, cal_no_turningpoints, sig_no_turningpoints):
+        t = tstart + dt * np.arange(cal.size)
+        print(tstart)
         result = lockin(t, cal, sig, sample_rate, omega_expected, wavelength)
         #result_abs.append(np.abs(result))
         result_abs_mean.append(np.abs(np.mean(result))) # changed abs() to np.abs()
@@ -620,8 +654,14 @@ for file_name in filenames:
     #print(result_abs)
     #print(len(result_abs))
     #print(result_abs_mean[None,:])
+
+
+    ########## Allan Dev
+    print(result_abs_mean)
     frshelpers.plot.plot_allan(np.atleast_2d(result_abs_mean))#result_abs_mean[None,:])
     plt.show()
+
+
     series_simulated_means = np.mean(series_simulated, axis=1)
     #np.save('E:\Measurements/46/2025-05-22/simulated_6bit_.npy', series_simulated_means)
 
