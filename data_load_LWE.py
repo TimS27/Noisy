@@ -137,7 +137,8 @@ plt.show() """
 #################################################
 filepaths = ["E:\Measurements/46/2025-06-10/slurm_supercontinuum_fused_silica_350_950_v007/slurm_supercontinuum_fused_silica_350_500_v007_Ext.dat",
              "E:\Measurements/46/2025-06-10/slurm_supercontinuum_fused_silica_350_950_v007/slurm_supercontinuum_fused_silica_550_700_v007_Ext.dat",
-             "E:\Measurements/46/2025-06-10/slurm_supercontinuum_fused_silica_350_950_v007/slurm_supercontinuum_fused_silica_750_950_v007_Ext.dat"]
+             "E:\Measurements/46/2025-06-10/slurm_supercontinuum_fused_silica_350_950_v007/slurm_supercontinuum_fused_silica_750_950_v007_Ext.dat",
+             "E:\Measurements/46/2025-06-06\slurm_supercontinuum_fused_silica_v004/slurm_supercontinuum_fused_silica_v004_Ext.dat"]
 
 # add 300 and 1000 from other files
 
@@ -156,6 +157,21 @@ for file in filepaths:
             #amp_pos_norm[amp_pos_norm < 1e-2] = 0
             spectra_amps.append(amp_pos_norm)
             print("Shape of spectrum amplitudes:", amp_pos_norm.shape)
+    if file == "E:\Measurements/46/2025-06-06\slurm_supercontinuum_fused_silica_v004/slurm_supercontinuum_fused_silica_v004_Ext.dat":
+        for i in [0,3]:
+            NB=4
+            f_pos, amp_pos_norm = extract_spectrum(data, i)
+            if i == 0:
+                #spectra_freqs.append(f_pos)
+                #spectra_amps.append(amp_pos_norm) 
+                spectra_freqs.insert(0, f_pos)
+                #amp_pos_norm[amp_pos_norm < 1e-2] = 0
+                spectra_amps.insert(0, amp_pos_norm)
+                print("Shape of spectrum amplitudes:", amp_pos_norm.shape)
+            else:
+                spectra_freqs.append(f_pos)
+                #amp_pos_norm[amp_pos_norm < 1e-2] = 0
+                spectra_amps.append(amp_pos_norm)     
     else:
         for i in [0,1,2,3]:
             NB=4
@@ -169,11 +185,12 @@ for file in filepaths:
 spectra_freqs = np.array(spectra_freqs)
 spectra_amps = np.array(spectra_amps)
 
+
 print("Final shape of spectra_freqs:", spectra_freqs.shape)
 print("Final shape of spectra_amps:", spectra_amps.shape)
 
 # Optional: manually define distances in mm (must match file order!)
-beamwaists = np.array([350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950])#, 14, 15])#[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]#, 16 ,17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]#, 29, 30, 31, 32, 33]
+beamwaists = np.array([300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000])#, 14, 15])#[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]#, 16 ,17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]#, 29, 30, 31, 32, 33]
 # Create 2D grids
 beamwaists_grid, freqs_grid = np.meshgrid(beamwaists, spectra_freqs[0] / 1e12)
 
