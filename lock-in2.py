@@ -194,6 +194,7 @@ def lockin(t, calibration, sig, sample_rate, omega_expected, wavelength):
 
 sample_rate = 500e3
 
+ne03ab = 0.37945067
 nenir20ac = 0.0092574
 nenir40ac = 0.0000585
 nd40a = 0.000351
@@ -201,50 +202,244 @@ ne20ab = 0.024822
 ne10ab = 0.0790946
 nenir240b = 0.0000478
 nenir260b = 0.00000017
-transmissions = {"E:\Measurements/46/2025-06-05/BHD1.dat": 0}
-""" transmissions = {
+
+#transmissions = {"E:\Measurements/46/2025-06-05/BHD1.dat": 0}
+
+transmissions = {
   #"E:\\Measurements/46/2025-06-03-mod\\tek0000CH1.isf": 0,
-  ############################ Files and transmissions from 2025-06-03 (1 mW LO) autobal
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0003CH1.isf": ne10ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0005CH1.isf": ne20ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0007CH1.isf": nenir20ac,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0009CH1.isf": nenir20ac*ne10ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0011CH1.isf": nd40a,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0013CH1.isf": nenir40ac,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0015CH1.isf": nenir40ac*ne20ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0017CH1.isf": nenir40ac*nd40a,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0019CH1.isf": nenir40ac*nd40a*ne20ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0021CH1.isf": nenir40ac*nd40a*nenir20ac,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0023CH1.isf": nenir240b*nenir20ac*ne20ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0025CH1.isf": nenir20ac*nd40a*ne20ab*ne10ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0027CH1.isf": nenir240b*nenir40ac,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0029CH1.isf": nenir240b*nd40a*ne10ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0031CH1.isf": nenir240b*nenir20ac*ne20ab*ne10ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0033CH1.isf": nenir240b*nd40a*ne20ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0035CH1.isf": nenir260b*nenir20ac*ne10ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0037CH1.isf": nenir40ac*nd40a*ne20ab*ne10ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0039CH1.isf": nenir240b*nenir40ac*nenir20ac,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0041CH1.isf": nenir40ac*nd40a*nenir20ac*ne10ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0043CH1.isf": nenir260b*nenir40ac,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0045CH1.isf": nenir240b*nenir40ac*ne20ab*ne10ab,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0047CH1.isf": nenir40ac*nd40a*ne20ab*nenir20ac,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0049CH1.isf": ne10ab*ne20ab*nenir20ac*nenir260b,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0051CH1.isf": ne10ab*nenir20ac*nenir40ac*nenir240b,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0053CH1.isf": ne20ab*nenir260b*nd40a,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0055CH1.isf": nenir40ac*nenir240b *nd40a,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0057CH1.isf": ne10ab*nenir40ac*nenir260b,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0059CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir240b,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0061CH1.isf": nenir20ac*nenir260b*nd40a,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0063CH1.isf": ne10ab*ne20ab*nenir20ac*nenir240b*nd40a,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0065CH1.isf": ne10ab*ne20ab*nenir260b*nd40a,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0067CH1.isf": nenir20ac*nenir40ac*nenir260b,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0069CH1.isf": ne10ab*nenir40ac*nenir240b*nd40a,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0071CH1.isf": ne20ab*nenir40ac*nenir240b*nd40a,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0073CH1.isf": ne20ab*nenir20ac*nenir260b*nd40a,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0075CH1.isf": ne10ab*ne20ab*nenir40ac*nenir240b*nd40a,
-  "E:\\Measurements/46/2025-06-03-mod2\\tek0077CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir240b*nd40a,
-  ####################################################
-} """
+    ############################ Files and transmissions from 2025-06-03 (1 mW LO) bal
+  "E:\\Measurements/46/2025-06-03-mod\\tek0002CH1.isf": ne10ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0004CH1.isf": ne20ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0006CH1.isf": nenir20ac,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0008CH1.isf": nenir20ac*ne10ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0010CH1.isf": nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0012CH1.isf": nenir40ac,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0014CH1.isf": nenir40ac*ne20ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0016CH1.isf": nenir40ac*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0018CH1.isf": nenir40ac*nd40a*ne20ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0020CH1.isf": nenir40ac*nd40a*nenir20ac,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0022CH1.isf": nenir240b*nenir20ac*ne20ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0024CH1.isf": nenir20ac*nd40a*ne20ab*ne10ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0026CH1.isf": nenir240b*nenir40ac,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0028CH1.isf": nenir240b*nd40a*ne10ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0030CH1.isf": nenir240b*nenir20ac*ne20ab*ne10ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0032CH1.isf": nenir240b*nd40a*ne20ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0034CH1.isf": nenir260b*nenir20ac*ne10ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0036CH1.isf": nenir40ac*nd40a*ne20ab*ne10ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0038CH1.isf": nenir240b*nenir40ac*nenir20ac,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0040CH1.isf": nenir40ac*nd40a*nenir20ac*ne10ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0042CH1.isf": nenir260b*nenir40ac,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0044CH1.isf": nenir240b*nenir40ac*ne20ab*ne10ab,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0046CH1.isf": nenir40ac*nd40a*ne20ab*nenir20ac,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0048CH1.isf": ne10ab*ne20ab*nenir20ac*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0050CH1.isf": ne10ab*nenir20ac*nenir40ac*nenir240b,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0052CH1.isf": ne20ab*nenir260b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0054CH1.isf": nenir40ac*nenir240b *nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0056CH1.isf": ne10ab*nenir40ac*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0058CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir240b,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0060CH1.isf": nenir20ac*nenir260b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0062CH1.isf": ne10ab*ne20ab*nenir20ac*nenir240b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0064CH1.isf": ne10ab*ne20ab*nenir260b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0066CH1.isf": nenir20ac*nenir40ac*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0068CH1.isf": ne10ab*nenir40ac*nenir240b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0070CH1.isf": ne20ab*nenir40ac*nenir240b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0072CH1.isf": ne20ab*nenir20ac*nenir260b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0074CH1.isf": ne10ab*ne20ab*nenir40ac*nenir240b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\tek0076CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir240b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0000CH1.isf": ne03ab,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0002CH1.isf": 0.6745,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0004CH1.isf": 0.9, # check this
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0006CH1.isf": 0.9*0.6745,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0008CH1.isf": 0.3208,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0010CH1.isf": 0.2019,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0012CH1.isf": ne03ab*ne03ab,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0014CH1.isf": ne10ab*nenir240b*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0016CH1.isf": ne03ab*nenir240b*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0018CH1.isf": ne20ab*nenir40ac*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0020CH1.isf": ne20ab*nenir240b*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0022CH1.isf": nenir20ac*nenir240b*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0024CH1.isf": ne03ab*ne20ab*nenir20ac*nenir40ac*nenir240b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0026CH1.isf": ne10ab*ne20ab*nenir20ac*nenir40ac*nenir240b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0028CH1.isf": ne10ab*nenir20ac*nenir260b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0030CH1.isf": ne03ab*nenir20ac*nenir260b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0032CH1.isf": ne03ab*ne20ab*nenir40ac*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0034CH1.isf": ne10ab*ne20ab*nenir40ac*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0036CH1.isf": nenir20ac*nenir40ac*nenir240b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0038CH1.isf": ne10ab*nenir20ac*nenir40ac*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0040CH1.isf": nenir40ac*nenir260b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0042CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0044CH1.isf": ne10ab*ne20ab*nenir20ac*nenir260b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0046CH1.isf": ne10ab*nenir20ac*nenir40ac*nenir240b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0048CH1.isf": nenir40ac*nenir240b*nenir260b,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0050CH1.isf": ne10ab*nenir40ac*nenir260b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0052CH1.isf": ne03ab*ne10ab*nenir40ac*nenir260b*nd40a,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new2-tek0000CH1.isf": 1,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0000CH1.isf": 557/550,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0002CH1.isf": 605/550,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0005CH1.isf": 672/550,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0007CH1.isf": 750/550,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0009CH1.isf": 858/550,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0011CH1.isf": 942/550,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0013CH1.isf": 1046/550,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0015CH1.isf": 1185/550,
+  "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0018CH1.isf": 1477/550,
+
+}
+
+""" ############################ Files and transmissions from 2025-06-03 (1 mW LO) autobal
+"E:\\Measurements/46/2025-06-03-mod2\\tek0003CH1.isf": ne10ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0005CH1.isf": ne20ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0007CH1.isf": nenir20ac,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0009CH1.isf": nenir20ac*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0011CH1.isf": nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0013CH1.isf": nenir40ac,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0015CH1.isf": nenir40ac*ne20ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0017CH1.isf": nenir40ac*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0019CH1.isf": nenir40ac*nd40a*ne20ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0021CH1.isf": nenir40ac*nd40a*nenir20ac,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0023CH1.isf": nenir240b*nenir20ac*ne20ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0025CH1.isf": nenir20ac*nd40a*ne20ab*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0027CH1.isf": nenir240b*nenir40ac,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0029CH1.isf": nenir240b*nd40a*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0031CH1.isf": nenir240b*nenir20ac*ne20ab*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0033CH1.isf": nenir240b*nd40a*ne20ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0035CH1.isf": nenir260b*nenir20ac*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0037CH1.isf": nenir40ac*nd40a*ne20ab*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0039CH1.isf": nenir240b*nenir40ac*nenir20ac,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0041CH1.isf": nenir40ac*nd40a*nenir20ac*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0043CH1.isf": nenir260b*nenir40ac,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0045CH1.isf": nenir240b*nenir40ac*ne20ab*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0047CH1.isf": nenir40ac*nd40a*ne20ab*nenir20ac,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0049CH1.isf": ne10ab*ne20ab*nenir20ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0051CH1.isf": ne10ab*nenir20ac*nenir40ac*nenir240b,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0053CH1.isf": ne20ab*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0055CH1.isf": nenir40ac*nenir240b *nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0057CH1.isf": ne10ab*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0059CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir240b,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0061CH1.isf": nenir20ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0063CH1.isf": ne10ab*ne20ab*nenir20ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0065CH1.isf": ne10ab*ne20ab*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0067CH1.isf": nenir20ac*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0069CH1.isf": ne10ab*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0071CH1.isf": ne20ab*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0073CH1.isf": ne20ab*nenir20ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0075CH1.isf": ne10ab*ne20ab*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\tek0077CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0001CH1.isf": ne03ab,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0003CH1.isf": 0.6745,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0005CH1.isf": 0.9, # check this
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0007CH1.isf": 0.9*0.6745,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0009CH1.isf": 0.3208,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0011CH1.isf": 0.2019,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0013CH1.isf": ne03ab*ne03ab,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0015CH1.isf": ne10ab*nenir240b*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0017CH1.isf": ne03ab*nenir240b*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0019CH1.isf": ne20ab*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0021CH1.isf": ne20ab*nenir240b*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0023CH1.isf": nenir20ac*nenir240b*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0025CH1.isf": ne03ab*ne20ab*nenir20ac*nenir40ac*nenir240b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0027CH1.isf": ne10ab*ne20ab*nenir20ac*nenir40ac*nenir240b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0029CH1.isf": ne10ab*nenir20ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0031CH1.isf": ne03ab*nenir20ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0033CH1.isf": ne03ab*ne20ab*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0035CH1.isf": ne10ab*ne20ab*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0037CH1.isf": nenir20ac*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0039CH1.isf": ne10ab*nenir20ac*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0041CH1.isf": nenir40ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0043CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0045CH1.isf": ne10ab*ne20ab*nenir20ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0047CH1.isf": ne10ab*nenir20ac*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0049CH1.isf": nenir40ac*nenir240b*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new-tek0051CH1.isf": ne10ab*nenir40ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new2-tek0001CH1.isf": 1,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new3-tek0001CH1.isf": 557/550,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new3-tek0003CH1.isf": 605/550,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new3-tek0006CH1.isf": 672/550,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new3-tek0008CH1.isf": 750/550,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new3-tek0010CH1.isf": 858/550,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new3-tek0012CH1.isf": 942/550,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new3-tek0014CH1.isf": 1046/550,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new3-tek0016CH1.isf": 1185/550,
+"E:\\Measurements/46/2025-06-03-mod2\\1mW-new3-tek0019CH1.isf": 1477/550,
+
+#################################################### """
+
+""" ############################ Files and transmissions from 2025-06-03 (1 mW LO) bal
+"E:\\Measurements/46/2025-06-03-mod\\tek0002CH1.isf": ne10ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0004CH1.isf": ne20ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0006CH1.isf": nenir20ac,
+"E:\\Measurements/46/2025-06-03-mod\\tek0008CH1.isf": nenir20ac*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0010CH1.isf": nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\tek0012CH1.isf": nenir40ac,
+"E:\\Measurements/46/2025-06-03-mod\\tek0014CH1.isf": nenir40ac*ne20ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0016CH1.isf": nenir40ac*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\tek0018CH1.isf": nenir40ac*nd40a*ne20ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0020CH1.isf": nenir40ac*nd40a*nenir20ac,
+"E:\\Measurements/46/2025-06-03-mod\\tek0022CH1.isf": nenir240b*nenir20ac*ne20ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0024CH1.isf": nenir20ac*nd40a*ne20ab*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0026CH1.isf": nenir240b*nenir40ac,
+"E:\\Measurements/46/2025-06-03-mod\\tek0028CH1.isf": nenir240b*nd40a*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0030CH1.isf": nenir240b*nenir20ac*ne20ab*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0032CH1.isf": nenir240b*nd40a*ne20ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0034CH1.isf": nenir260b*nenir20ac*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0036CH1.isf": nenir40ac*nd40a*ne20ab*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0038CH1.isf": nenir240b*nenir40ac*nenir20ac,
+"E:\\Measurements/46/2025-06-03-mod\\tek0040CH1.isf": nenir40ac*nd40a*nenir20ac*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0042CH1.isf": nenir260b*nenir40ac,
+"E:\\Measurements/46/2025-06-03-mod\\tek0044CH1.isf": nenir240b*nenir40ac*ne20ab*ne10ab,
+"E:\\Measurements/46/2025-06-03-mod\\tek0046CH1.isf": nenir40ac*nd40a*ne20ab*nenir20ac,
+"E:\\Measurements/46/2025-06-03-mod\\tek0048CH1.isf": ne10ab*ne20ab*nenir20ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\tek0050CH1.isf": ne10ab*nenir20ac*nenir40ac*nenir240b,
+"E:\\Measurements/46/2025-06-03-mod\\tek0052CH1.isf": ne20ab*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\tek0054CH1.isf": nenir40ac*nenir240b *nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\tek0056CH1.isf": ne10ab*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\tek0058CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir240b,
+"E:\\Measurements/46/2025-06-03-mod\\tek0060CH1.isf": nenir20ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\tek0062CH1.isf": ne10ab*ne20ab*nenir20ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\tek0064CH1.isf": ne10ab*ne20ab*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\tek0066CH1.isf": nenir20ac*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\tek0068CH1.isf": ne10ab*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\tek0070CH1.isf": ne20ab*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\tek0072CH1.isf": ne20ab*nenir20ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\tek0074CH1.isf": ne10ab*ne20ab*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\tek0076CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0000CH1.isf": ne03ab,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0002CH1.isf": 0.6745,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0004CH1.isf": 0.9, # check this
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0006CH1.isf": 0.9*0.6745,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0008CH1.isf": 0.3208,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0010CH1.isf": 0.2019,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0012CH1.isf": ne03ab*ne03ab,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0014CH1.isf": ne10ab*nenir240b*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0016CH1.isf": ne03ab*nenir240b*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0018CH1.isf": ne20ab*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0020CH1.isf": ne20ab*nenir240b*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0022CH1.isf": nenir20ac*nenir240b*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0024CH1.isf": ne03ab*ne20ab*nenir20ac*nenir40ac*nenir240b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0026CH1.isf": ne10ab*ne20ab*nenir20ac*nenir40ac*nenir240b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0028CH1.isf": ne10ab*nenir20ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0030CH1.isf": ne03ab*nenir20ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0032CH1.isf": ne03ab*ne20ab*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0034CH1.isf": ne10ab*ne20ab*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0036CH1.isf": nenir20ac*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0038CH1.isf": ne10ab*nenir20ac*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0040CH1.isf": nenir40ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0042CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0044CH1.isf": ne10ab*ne20ab*nenir20ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0046CH1.isf": ne10ab*nenir20ac*nenir40ac*nenir240b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0048CH1.isf": nenir40ac*nenir240b*nenir260b,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0050CH1.isf": ne10ab*nenir40ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new-tek0052CH1.isf": ne03ab*ne10ab*nenir40ac*nenir260b*nd40a,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new2-tek0000CH1.isf": 1,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0000CH1.isf": 557/550,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0002CH1.isf": 605/550,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0005CH1.isf": 672/550,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0007CH1.isf": 750/550,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0009CH1.isf": 858/550,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0011CH1.isf": 942/550,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0013CH1.isf": 1046/550,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0015CH1.isf": 1185/550,
+"E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0018CH1.isf": 1477/550, """
 
 ############### Files and transmissions from 2025-06-02
 """ "E:\\Measurements/46/2025-06-02-mod\\tek0000CH1.isf": 0,
@@ -290,44 +485,6 @@ transmissions = {"E:\Measurements/46/2025-06-05/BHD1.dat": 0}
 
 
 ############################ Files and transmissions from 2025-06-03 (1 mW LO) bal
-""" "E:\\Measurements/46/2025-06-03-mod\\tek0002CH1.isf": ne10ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0004CH1.isf": ne20ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0006CH1.isf": nenir20ac,
-"E:\\Measurements/46/2025-06-03-mod\\tek0008CH1.isf": nenir20ac*ne10ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0010CH1.isf": nd40a,
-"E:\\Measurements/46/2025-06-03-mod\\tek0012CH1.isf": nenir40ac,
-"E:\\Measurements/46/2025-06-03-mod\\tek0014CH1.isf": nenir40ac*ne20ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0016CH1.isf": nenir40ac*nd40a,
-"E:\\Measurements/46/2025-06-03-mod\\tek0018CH1.isf": nenir40ac*nd40a*ne20ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0020CH1.isf": nenir40ac*nd40a*nenir20ac,
-"E:\\Measurements/46/2025-06-03-mod\\tek0022CH1.isf": nenir240b*nenir20ac*ne20ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0024CH1.isf": nenir20ac*nd40a*ne20ab*ne10ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0026CH1.isf": nenir240b*nenir40ac,
-"E:\\Measurements/46/2025-06-03-mod\\tek0028CH1.isf": nenir240b*nd40a*ne10ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0030CH1.isf": nenir240b*nenir20ac*ne20ab*ne10ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0032CH1.isf": nenir240b*nd40a*ne20ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0034CH1.isf": nenir260b*nenir20ac*ne10ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0036CH1.isf": nenir40ac*nd40a*ne20ab*ne10ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0038CH1.isf": nenir240b*nenir40ac*nenir20ac,
-"E:\\Measurements/46/2025-06-03-mod\\tek0040CH1.isf": nenir40ac*nd40a*nenir20ac*ne10ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0042CH1.isf": nenir260b*nenir40ac,
-"E:\\Measurements/46/2025-06-03-mod\\tek0044CH1.isf": nenir240b*nenir40ac*ne20ab*ne10ab,
-"E:\\Measurements/46/2025-06-03-mod\\tek0046CH1.isf": nenir40ac*nd40a*ne20ab*nenir20ac,
-"E:\\Measurements/46/2025-06-03-mod\\tek0048CH1.isf": ne10ab*ne20ab*nenir20ac*nenir260b,
-"E:\\Measurements/46/2025-06-03-mod\\tek0050CH1.isf": ne10ab*nenir20ac*nenir40ac*nenir240b,
-"E:\\Measurements/46/2025-06-03-mod\\tek0052CH1.isf": ne20ab*nenir260b*nd40a,
-"E:\\Measurements/46/2025-06-03-mod\\tek0054CH1.isf": nenir40ac*nenir240b *nd40a,
-"E:\\Measurements/46/2025-06-03-mod\\tek0056CH1.isf": ne10ab*nenir40ac*nenir260b,
-"E:\\Measurements/46/2025-06-03-mod\\tek0058CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir240b,
-"E:\\Measurements/46/2025-06-03-mod\\tek0060CH1.isf": nenir20ac*nenir260b*nd40a,
-"E:\\Measurements/46/2025-06-03-mod\\tek0062CH1.isf": ne10ab*ne20ab*nenir20ac*nenir240b*nd40a,
-"E:\\Measurements/46/2025-06-03-mod\\tek0064CH1.isf": ne10ab*ne20ab*nenir260b*nd40a,
-"E:\\Measurements/46/2025-06-03-mod\\tek0066CH1.isf": nenir20ac*nenir40ac*nenir260b,
-"E:\\Measurements/46/2025-06-03-mod\\tek0068CH1.isf": ne10ab*nenir40ac*nenir240b*nd40a,
-"E:\\Measurements/46/2025-06-03-mod\\tek0070CH1.isf": ne20ab*nenir40ac*nenir240b*nd40a,
-"E:\\Measurements/46/2025-06-03-mod\\tek0072CH1.isf": ne20ab*nenir20ac*nenir260b*nd40a,
-"E:\\Measurements/46/2025-06-03-mod\\tek0074CH1.isf": ne10ab*ne20ab*nenir40ac*nenir240b*nd40a,
-"E:\\Measurements/46/2025-06-03-mod\\tek0076CH1.isf": ne20ab*nenir20ac*nenir40ac*nenir240b*nd40a, """
   ###################################################
 
 #slow_files = [
@@ -394,8 +551,20 @@ def load(filename):
 
 
 #filenames = glob.glob("E:\Measurements/46/2025-06-03-mod2/tek*CH1.isf")#)"tek*CH1.isf")
-filenames = glob.glob("E:\Measurements/46/2025-06-05/BHD1.dat")#)"tek*CH1.isf")
 
+# Bal 1mW
+filenames1 = glob.glob("E:\Measurements/46/2025-06-03-mod/tek*CH1.isf")#BHD1.dat)
+filenames2 = glob.glob("E:\Measurements/46/2025-06-03-mod/1mW-new-tek*CH1.isf")
+filenames3 = glob.glob("E:\Measurements/46/2025-06-03-mod/1mW-new2-tek*CH1.isf")
+filenames4 = glob.glob("E:\Measurements/46/2025-06-03-mod/1mW-new3-tek*CH1.isf")
+
+# AutoBal 1mW
+#filenames1 = glob.glob("E:\Measurements/46/2025-06-03-mod2/tek*CH1.isf")#BHD1.dat)
+#filenames2 = glob.glob("E:\Measurements/46/2025-06-03-mod2/1mW-new-tek*CH1.isf")
+#filenames3 = glob.glob("E:\Measurements/46/2025-06-03-mod2/1mW-new2-tek*CH1.isf")
+#filenames4 = glob.glob("E:\Measurements/46/2025-06-03-mod2/1mW-new3-tek*CH1.isf")
+
+filenames = filenames1 + filenames2 + filenames3 + filenames4
 
 #filenames = ["500microWLO-1,6V-delayPD-20MS-40s-nenir40ac-delay.isf"]
 #filenames = ["tek0013CH1.isf"]
@@ -460,7 +629,7 @@ for file_name in filenames:
     dt = sample_rate**-1
     wavelength = 1064e-9
 
-    #t = np.arange(calibration.size)*dt
+    t = np.arange(calibration.size)*dt  # no allan
     #t = np.arange(data_cal[0][0:500000].size)*dt
     #calibration = data_cal[1][0:500000]
     #sig = data_inter[1][0:500000]
@@ -584,26 +753,30 @@ for file_name in filenames:
 
         sig_no_turningpoints.append(sig[i_start:i_stop])
         sig = sig[i_start:]
-        #t_no_turningpoints.append(t[i_start:i_stop])
-        if len(t_starts) > 0:
-          t_starts.append(i_start*dt + t_starts[-1])
-        else:
-          t_starts.append(i_start*dt)
-        #t = t[i_start:]
+        t_no_turningpoints.append(t[i_start:i_stop])  # no allan
+        #if len(t_starts) > 0:                        # allan
+        #  t_starts.append(i_start*dt + t_starts[-1]) # allan
+        #else:                                        # allan
+        #  t_starts.append(i_start*dt)                # allan
+        t = t[i_start:] # no allan
         cal_no_turningpoints.append(calibration[i_start:i_stop])
         calibration = calibration[i_start:]
         sig_trigger = sig_trigger[i_start:]
         if(i_stop > sig.size):
             break
 
-        print(i_start)
+        #print(i_start)
     sig_no_turningpoints = sig_no_turningpoints[1:]
     t_no_turningpoints = t_no_turningpoints[1:]
     cal_no_turningpoints = cal_no_turningpoints[1:]
 
-    sig_no_turningpoints = sig_no_turningpoints[:-1]
-    t_no_turningpoints = t_no_turningpoints[:-1]
-    cal_no_turningpoints = cal_no_turningpoints[:-1]
+    sig_no_turningpoints = sig_no_turningpoints[:1]
+    t_no_turningpoints = t_no_turningpoints[:1]
+    cal_no_turningpoints = cal_no_turningpoints[:1]
+
+    #sig_no_turningpoints = sig_no_turningpoints[:-1]  # allan
+    #t_no_turningpoints = t_no_turningpoints[:-1]      # allan
+    #cal_no_turningpoints = cal_no_turningpoints[:-1]  # allan
 
     #plt.plot(np.concatenate(t_no_turningpoints), np.concatenate(cal_no_turningpoints))
 
@@ -638,9 +811,11 @@ for file_name in filenames:
     #result_abs = []
     result_abs_mean = []
     result_phase_mean = []
-    for tstart,cal,sig in zip(t_starts, cal_no_turningpoints, sig_no_turningpoints):
+    """ for tstart,cal,sig in zip(t_starts, cal_no_turningpoints, sig_no_turningpoints):    # allan
         t = tstart + dt * np.arange(cal.size)
-        print(tstart)
+        #print(tstart)
+        result = lockin(t, cal, sig, sample_rate, omega_expected, wavelength) """
+    for t,cal,sig in zip(t_no_turningpoints, cal_no_turningpoints, sig_no_turningpoints):    # allan
         result = lockin(t, cal, sig, sample_rate, omega_expected, wavelength)
         #result_abs.append(np.abs(result))
         result_abs_mean.append(np.abs(np.mean(result))) # changed abs() to np.abs()
@@ -657,9 +832,9 @@ for file_name in filenames:
 
 
     ########## Allan Dev
-    print(result_abs_mean)
-    frshelpers.plot.plot_allan(np.atleast_2d(result_abs_mean))#result_abs_mean[None,:])
-    plt.show()
+    #print(result_abs_mean)
+    #frshelpers.plot.plot_allan(np.atleast_2d(result_abs_mean))#result_abs_mean[None,:])
+    #plt.show()
 
 
     series_simulated_means = np.mean(series_simulated, axis=1)
@@ -758,7 +933,7 @@ plt.ylim(1e-7, 100)
 plt.xlabel('Signal Arm Power [W]')
 plt.ylabel('Measured Signal [V]')
 #plt.title('BHD Signal vs. Signal Arm Power ')
-plt.title('experimental data')
+plt.title('Experimental data (Balanced, 1 mW LO)')
 plt.legend(loc='lower left')#, bbox_to_anchor=(0,0.15))
 ax1.xaxis.grid(visible=True, which='both')
 ax1.yaxis.grid(visible=True, which='major')
