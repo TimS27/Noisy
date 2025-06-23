@@ -4,8 +4,19 @@ from scipy.signal import welch
 from scipy import constants
 from scipy.optimize import curve_fit
 from scipy.signal import medfilt
+from isfread_py3 import isfread
 #from scipy.signal import savgol_filter
 #from scipy.integrate import cumulative_trapezoid
+
+font_size_label = 18
+font_size_title = 20
+
+plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "serif",
+    "font.size": 11,
+    "text.latex.preamble": r"\usepackage{lmodern}"
+})
 
 # Functions
 def compute_fosn(rin, rin_shot_noise):
@@ -82,6 +93,20 @@ for i in [file_balanced, file_autobalanced, file_dark, file_osci, file_signal]:
 time_data.append(np.load(file_balanced_400)[:,0])
 for i in [file_balanced_400, file_autobalanced_400, file_balanced_800,file_autobalanced_800, file_dark, file_osci, file_signal, file_signal_400]:
         time_data.append(np.load(i)[:,1])
+
+file_500microW_bal = "E:/Measurements/46/2025-06-23/500microW-bal.isf"
+file_500microW_signal = "E:/Measurements/46/2025-06-23/500microW-signal.isf"
+file_500microW_signal_complete_power = "E:/Measurements/46/2025-06-23/500microWsignal-complete-power.isf"
+file_500microW_autobal_no_attenuator = "E:/Measurements/46/2025-06-23/500microW-autobal-no-attenuator.isf"
+file_nirvana_dark_noise = "E:/Measurements/46/2025-06-23/nirvana-dark-noise.isf"
+file_osci_dark_noise = "E:/Measurements/46/2025-06-23/osci-dark-noise.isf"
+
+
+time_data.append(np.linspace(0,10,5000000,endpoint=False))  # add time axis
+for file in ["file_500microW_bal","file_500microW_signal","file_500microW_signal_complete_power","500microW-autobal-no-attenuator","file_nirvana_dark_noise","file_osci_dark_noise"]:
+        data, header = isfread(file)
+        time_data.append(data)
+
 
 average_signal_400 = np.mean(time_data[8])
 average_signal_800 = np.mean(time_data[7])
