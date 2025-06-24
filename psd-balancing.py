@@ -90,9 +90,9 @@ time_data = []
 """ time_data.append(np.load(file_balanced)[:,0])
 for i in [file_balanced, file_autobalanced, file_dark, file_osci, file_signal]:
         time_data.append(np.load(i)[:,1]) """
-time_data.append(np.load(file_balanced_400)[:,0])
-for i in [file_balanced_400, file_autobalanced_400, file_balanced_800,file_autobalanced_800, file_dark, file_osci, file_signal, file_signal_400]:
-        time_data.append(np.load(i)[:,1])
+#time_data.append(np.load(file_balanced_400)[:,0])
+#for i in [file_balanced_400, file_autobalanced_400, file_balanced_800,file_autobalanced_800, file_dark, file_osci, file_signal, file_signal_400]:
+#        time_data.append(np.load(i)[:,1])
 
 file_500microW_bal = "E:/Measurements/46/2025-06-23/500microW-bal.isf"
 file_500microW_signal = "E:/Measurements/46/2025-06-23/500microW-signal.isf"
