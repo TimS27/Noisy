@@ -10,13 +10,55 @@ import fourioso, binreduce
 from scipy import constants
 import frshelpers.plot
 import glob
+import os
+import re
+from scipy.signal import windows
+import pandas as pd
 
+plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "serif",
+    "font.size": 11,
+    "text.latex.preamble": r"\usepackage{lmodern}"
+})
 
 def plot_stft(data, sample_rate, data2=None):
   t = np.arange(data.size)*sample_rate**-1
 
+  # Plot stft of signal, spectrum, and raw signal data
   if 0:
-    fig = plt.figure(figsize=(6,2.), constrained_layout=True)
+    fig = plt.figure(figsize=(8, 5), constrained_layout=True)
+    gs = fig.add_gridspec(2, 2, height_ratios=[1.5, 1], width_ratios=[3, 1])  # top row taller
+
+    # Top-left: STFT
+    ax0 = fig.add_subplot(gs[0, 0])
+    f, t_short, Zxx = signal.stft(data, sample_rate, nperseg=256)
+    pcm = ax0.pcolormesh(t_short, f / 1e3, np.abs(Zxx), shading='auto',
+                        norm=colors.LogNorm(vmin=np.abs(Zxx).max() * 1e-8, vmax=np.abs(Zxx).max()))
+    ax0.set_title('Short-time Fourier transform')
+    ax0.set_ylabel('Frequency [kHz]')
+    ax0.set_xlabel('Time [s]')
+
+    # Top-right: Spectrum
+    ax1 = fig.add_subplot(gs[0, 1])
+    nu, spectrum = fourioso.transform(t, data)
+    nur, specr = binreduce.multi_binreduce(nu, 5000, abs(spectrum) ** 2)
+    ax1.plot(specr[nur > 0], nur[nur > 0] / 1e3)
+    ax1.set_xscale("log")
+    ax1.set_xlim((1e-15, 1e-6))
+    ax1.set_xlabel("PSD")
+    ax1.set_ylabel("Frequency [kHz]")
+    ax1.set_title("Spectrum")
+
+    # Bottom (spanning both): Raw signal
+    ax2 = fig.add_subplot(gs[1, :])
+    ax2.plot(t, data)
+    ax2.set_xlabel("Time [s]")
+    ax2.set_ylabel("Balanced signal (V)")
+    ax2.set_ylim((-.12, .12))
+    ax2.set_title("Raw balanced-detector output (signal: {:.1f} nW, LO: 500 µW)".format(500e-6 * T / 1e-9))
+
+    """ fig = plt.figure(figsize=(6,2.), constrained_layout=True)
     gs = fig.add_gridspec(1,1)
     ax = fig.add_subplot(gs[0,0])
     ax.plot(t, data)
@@ -24,7 +66,7 @@ def plot_stft(data, sample_rate, data2=None):
     ax.set_ylabel("balanced signal (V)")
     ax.set_ylim((-.12,.12))
     ax.set_title("raw balanced-detector output (signal: {:.1f} nW, LO: 500 µW)".format(500e-6*T/1e-9))
-    plt.savefig("rawall.png")
+    #plt.savefig("rawall.png")
 
     fig = plt.figure(figsize=(6,3), constrained_layout=True)
     gs = fig.add_gridspec(1,1)
@@ -32,9 +74,9 @@ def plot_stft(data, sample_rate, data2=None):
     f, t_short, Zxx = signal.stft(data, sample_rate, nperseg=256)
     plt.pcolormesh(t_short, f/1e3, np.abs(Zxx), norm=colors.LogNorm(vmin=np.abs(Zxx).max()*1e-8, vmax=np.abs(Zxx).max()))
     ax.set_title('Short-time Fourier transform')
-    ax.set_ylabel('f [kHz]')
+    ax.set_ylabel('frequency [kHz]')
     ax.set_xlabel('t (s)')
-    plt.savefig("2dall.png")
+    #plt.savefig("2dall.png")
 
     fig = plt.figure(figsize=(1.5,3), constrained_layout=True)
     gs = fig.add_gridspec(1,1)
@@ -47,11 +89,11 @@ def plot_stft(data, sample_rate, data2=None):
     ax.set_xlabel("PSD")
     ax.set_ylabel("f (kHz)")
     ax.set_title("spectrum")
-    plt.savefig("spec.png")
+    #plt.savefig("spec.png") """
 
     plt.show()
 
-  ax=plt.subplot(2,2,1)
+  """ ax=plt.subplot(2,2,1)
   f, t_short, Zxx = signal.stft(data, sample_rate, nperseg=256)
   plt.pcolormesh(t_short, f/1e3, np.abs(Zxx), norm=colors.LogNorm(vmin=np.abs(Zxx).max()*1e-8, vmax=np.abs(Zxx).max()))
   print(np.abs(Zxx).max())
@@ -77,7 +119,7 @@ def plot_stft(data, sample_rate, data2=None):
     print(np.abs(Zxx).max())
     plt.title('STFT Magnitude')
     plt.ylabel('Frequency [kHz]')
-    plt.xlabel('Time [sec]')
+    plt.xlabel('Time [sec]') """
 
 def lockin(t, calibration, sig, sample_rate, omega_expected, wavelength):
   # shift the carrier frequency of calibration signal down to DC
@@ -123,7 +165,7 @@ def lockin(t, calibration, sig, sample_rate, omega_expected, wavelength):
     plt.xlabel('Time [sec]')
     #plt.axvline(t[i_trigger], color='r')
     #plt.axvline(t[i_start], color='r')
-    #plt.axvline(t[i_stop], color='r') """
+    #plt.axvline(t[i_stop], color='r')
   
     plt.subplot(2,1,2, sharex=ax)
     f, t_short, Zxx = signal.stft(calibration, sample_rate, nperseg=256)
@@ -157,6 +199,7 @@ def lockin(t, calibration, sig, sample_rate, omega_expected, wavelength):
   siginterp_reconstructed = 2*np.real( (-1j)*(sig_i_lowpass+1j*sig_q_lowpass)*np.exp(1j*2*np.pi*constants.c/wavelength*delay_axis_evenly) )
 
   if 0:
+    # Plot interpolated signal vs. interpolated even delay
     plt.figure()
     #ax=plt.subplot(2,1,1)
     plt.plot(delay_axis_evenly, sig_interp)
@@ -203,11 +246,35 @@ ne10ab = 0.0790946
 nenir240b = 0.0000478
 nenir260b = 0.00000017
 
-#transmissions = {"E:\Measurements/46/2025-06-05/BHD1.dat": 0}
 
+
+############ get transmission dict
+folder_path = "C:\\Users/Admin/Documents/bhd-simulations/only_shot"
+
+# regex pattern
+pattern = re.compile(r"tim_onlyshot_([0-9.eE+-]+)_[0-9]*npz")#r"tim_test5_([0-9.eE+-]+)_[0-9]*npz"#r"tim_test3_([0-9.eE+-]+)\.npz"
+
+file_dict = {}
+for filename in os.listdir(folder_path):
+    match = pattern.match(filename)
+    if match:
+        transmission_str = match.group(1)
+        try:
+            transmission = float(transmission_str)
+            filepath = os.path.join(folder_path, filename)
+            file_dict[filepath] = transmission
+        except ValueError:
+            pass  # skip if conversion fails
+############
+print(file_dict)
+
+#transmissions = file_dict
+
+#transmissions = {"E:\Measurements/46/2025-06-05/BHD1.dat": 0}
 transmissions = {
-  #"E:\\Measurements/46/2025-06-03-mod\\tek0000CH1.isf": 0,
-    ############################ Files and transmissions from 2025-06-03 (1 mW LO) bal
+  #"E:\\Measurements/46/2025-06-03-mod\\tek0014CH1.isf": nenir40ac*ne20ab,
+    
+############################ Files and transmissions from 2025-06-03 (1 mW LO) bal
   "E:\\Measurements/46/2025-06-03-mod\\tek0002CH1.isf": ne10ab,
   "E:\\Measurements/46/2025-06-03-mod\\tek0004CH1.isf": ne20ab,
   "E:\\Measurements/46/2025-06-03-mod\\tek0006CH1.isf": nenir20ac,
@@ -283,8 +350,8 @@ transmissions = {
   "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0013CH1.isf": 1046/550,
   "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0015CH1.isf": 1185/550,
   "E:\\Measurements/46/2025-06-03-mod\\1mW-new3-tek0018CH1.isf": 1477/550,
-
 }
+
 
 """ ############################ Files and transmissions from 2025-06-03 (1 mW LO) autobal
 "E:\\Measurements/46/2025-06-03-mod2\\tek0003CH1.isf": ne10ab,
@@ -547,8 +614,11 @@ def load(filename):
 #filenames = glob.glob("tim_onlyshot*.npz")
 #filenames = glob.glob("*-delay.isf")
 
+# Simulation data
+#filenames = glob.glob("C:\\Users/Admin/Documents/bhd-simulations/only_shot/tim_onlyshot_*.npz")
 
-
+# PLotting test
+#filenames = glob.glob("E:\Measurements/46/2025-06-03-mod\\tek0014CH1.isf")
 
 #filenames = glob.glob("E:\Measurements/46/2025-06-03-mod2/tek*CH1.isf")#)"tek*CH1.isf")
 
@@ -638,10 +708,11 @@ for file_name in filenames:
     plt.plot(sig+0.2)
     plt.show() """
 
+    # Plot STFT with omega expected and area around it
     if 0:
       ax = plt.subplot(2,1,1)
       f, t_short, Zxx = signal.stft(sig, sample_rate, nperseg=256)
-      plt.pcolormesh(t_short, f, np.abs(Zxx), norm=colors.LogNorm(vmin= np.abs(Zxx).max()*1e-8, vmax= np.abs(Zxx).max()))
+      plt.pcolormesh(t_short, f, np.abs(Zxx), norm=colors.LogNorm(vmin= np.abs(Zxx).max()*1e-15, vmax= np.abs(Zxx).max()))
       plt.axhline(omega_expected/(2*np.pi), color='r')
       plt.axhline(omega_expected/(2*np.pi)+(omega_expected/(2*np.pi))/4, color='r')
       plt.axhline(omega_expected/(2*np.pi)-(omega_expected/(2*np.pi))/4, color='r')
@@ -654,7 +725,7 @@ for file_name in filenames:
   
       plt.subplot(2,1,2, sharex=ax)
       f, t_short, Zxx = signal.stft(calibration, sample_rate, nperseg=256)
-      plt.pcolormesh(t_short, f, np.abs(Zxx), norm=colors.LogNorm(vmin= np.abs(Zxx).max()*1e-8, vmax= np.abs(Zxx).max()))
+      plt.pcolormesh(t_short, f, np.abs(Zxx), norm=colors.LogNorm(vmin= np.abs(Zxx).max()*1e-15, vmax= np.abs(Zxx).max()))
       plt.axhline(omega_expected/(2*np.pi), color='r')
       plt.axhline(omega_expected/(2*np.pi)+(omega_expected/(2*np.pi))/4, color='r')
       plt.axhline(omega_expected/(2*np.pi)-(omega_expected/(2*np.pi))/4, color='r')
@@ -700,7 +771,7 @@ for file_name in filenames:
 #          i_start = i_trigger + int(0.04 * sample_rate)
 #          i_stop = i_start + int(0.06 * sample_rate)
         i_start = i_trigger + int(0.04*3.3 * sample_rate)
-        i_stop = i_start + int(0.06*4.5 * sample_rate)
+        i_stop = i_start + int(0.06*4.2 * sample_rate)  #0.06*4.5
 
         """ plt.plot(sig)
         plt.axvline(i_trigger)
@@ -708,7 +779,9 @@ for file_name in filenames:
         plt.axvline(i_stop)
         plt.show() """
 
+        # Raw signal data
         if 0:
+          # zoomemd out
           fig = plt.figure(figsize=(6,2.0), constrained_layout=True)
           gs = fig.add_gridspec(1,1)
           ax = fig.add_subplot(gs[0,0])
@@ -716,8 +789,9 @@ for file_name in filenames:
           ax.set_xlabel("t (s)")
           ax.set_ylabel("balanced signal (V)")
           ax.set_title("raw balanced-detector output (signal: {:.1f} nW, LO: 500 µW)".format(500e-6*T/1e-9))
-          plt.savefig("withtp.png")
+          #plt.savefig("withtp.png")
 
+          # zoomed in
           fig = plt.figure(figsize=(6,2.0), constrained_layout=True)
           gs = fig.add_gridspec(1,1)
           ax = fig.add_subplot(gs[0,0])
@@ -726,24 +800,27 @@ for file_name in filenames:
           ax.set_ylabel("balanced signal (V)")
           ax.set_title("raw balanced-detector output (signal: {:.1f} nW, LO: 500 µW)".format(500e-6*T/1e-9))
           ax.set_xlim((0.06,0.061))
-          plt.savefig("zoom.png")
+          #plt.savefig("zoom.png")
 
           plt.show()
 
+        # Plot stft of calibration signal and trigger signal
         if 0:
+          plt.figure(figsize=(8,6))
           ax = plt.subplot(2,1,1)
           f, t_short, Zxx = signal.stft(calibration, sample_rate, nperseg=256)
           plt.pcolormesh(t_short, f, np.abs(Zxx), norm=colors.LogNorm(vmin= np.abs(Zxx).max()*1e-8, vmax= np.abs(Zxx).max()))
           plt.axhline(omega_expected/(2*np.pi), color='r')
           plt.axhline(omega_expected/(2*np.pi)+(omega_expected/(2*np.pi))/4, color='r')
           plt.axhline(omega_expected/(2*np.pi)-(omega_expected/(2*np.pi))/4, color='r')
-          plt.title('STFT Magnitude')
+          plt.title('STFT Magnitude and Scanning Trigger Signal for the Calibration Signal')
           plt.ylabel('Frequency [Hz]')
-          plt.xlabel('Time [sec]')
           plt.axvline(t[i_trigger]-t[0], color='r')
-          plt.axvline(t[i_start]-t[0], color='r')
-          plt.axvline(t[i_stop]-t[0], color='r')
+          plt.axvline(t[i_start]-t[0], color='orange')
+          plt.axvline(t[i_stop]-t[0], color='blue')
           plt.subplot(2,1,2, sharex=ax)
+          plt.xlabel('Time (s)')
+          plt.ylabel('Trigger (a.u.)')
           plt.plot(t-t[0], sig_trigger)
           plt.axvline(t[i_trigger]-t[0], color='r')
           plt.axvline(t[i_start]-t[0], color='r')
@@ -770,9 +847,9 @@ for file_name in filenames:
     t_no_turningpoints = t_no_turningpoints[1:]
     cal_no_turningpoints = cal_no_turningpoints[1:]
 
-    sig_no_turningpoints = sig_no_turningpoints[:1]
-    t_no_turningpoints = t_no_turningpoints[:1]
-    cal_no_turningpoints = cal_no_turningpoints[:1]
+    sig_no_turningpoints = sig_no_turningpoints[:5]
+    t_no_turningpoints = t_no_turningpoints[:5]
+    cal_no_turningpoints = cal_no_turningpoints[:5]
 
     #sig_no_turningpoints = sig_no_turningpoints[:-1]  # allan
     #t_no_turningpoints = t_no_turningpoints[:-1]      # allan
@@ -818,7 +895,8 @@ for file_name in filenames:
     for t,cal,sig in zip(t_no_turningpoints, cal_no_turningpoints, sig_no_turningpoints):    # allan
         result = lockin(t, cal, sig, sample_rate, omega_expected, wavelength)
         #result_abs.append(np.abs(result))
-        result_abs_mean.append(np.abs(np.mean(result))) # changed abs() to np.abs()
+        # windowing slved problem: dc wasnt averaged out sufficiently
+        result_abs_mean.append(np.abs(np.average(result, weights=windows.tukey(result.size, alpha=0.5)))) # changed abs() to np.abs()  #weights=windows.tukey(result.size, alpha=0.5
         result_phase_mean.append(np.angle(np.mean(result)))
 
     #print(result_abs_mean, result_phase_mean)
@@ -836,7 +914,9 @@ for file_name in filenames:
     #frshelpers.plot.plot_allan(np.atleast_2d(result_abs_mean))#result_abs_mean[None,:])
     #plt.show()
 
-
+    #for i in np.array(series_simulated).T:
+       
+    #series_simulated_std = np.mean(series_simulated, axis=1)
     series_simulated_means = np.mean(series_simulated, axis=1)
     #np.save('E:\Measurements/46/2025-05-22/simulated_6bit_.npy', series_simulated_means)
 
@@ -888,6 +968,12 @@ for file_name in filenames:
     #plt.plot(calibration_normalized*0.002)
     #plt.show()
 
+# Extract different scans for plotting statistics
+series_simulated_means = np.array(series_simulated).ravel()
+transmissions_simulated = np.repeat(transmissions_simulated, np.array(series_simulated).shape[1])
+#print(series_simulated_means)
+#print(transmissions_simulated)
+
 """ simulated_6bit = np.load('E:\Measurements/46/2025-05-22/simulated_6bit_.npy')
 simulated_nonoise = np.load('E:\Measurements/46/2025-05-22/simulated_no_noise.npy')
 simulated_6bitNEP20pW = np.load('E:\Measurements/46/2025-05-22/simulated_6bitNEP20pW.npy')
@@ -913,33 +999,48 @@ E_photon = constants.h * constants.c/wavelength
 def power_to_photons(P):
     return P / E_photon
 
-fig, ax1 = plt.subplots(figsize=(8,6))
-#plt.loglog(x_axis_voltage, expected_voltage)
-#plt.loglog(x_axis, expected_voltage, label='g*r*4*Es*ELO')
-#plt.loglog(x_axis, y_fit, label="Balanced Fit")
-plt.gca().invert_xaxis()  # Inverts the x-axis
-#plt.loglog(signal_voltage, data)
-plt.loglog(signal_power.max()*np.logspace(-15,0), series_simulated_means.max()*np.logspace(-15,0)**.5, 'g--',alpha=0.3)# (Linear Output)') #'--o'
-plt.loglog(signal_power, series_simulated_means, 'o', color="green", label='Signal Balanced')# (Linear Output)') #'--o'
-#plt.loglog(signal_power, simulated_onlyshot, 'o', color="green", label='Simulated Signal Balanced (Only Shot Noise)')# (Linear Output)') #'--o'
-#plt.loglog(a,b, '--o',color="green", label='test')# (Linear Output)')
-#plt.loglog(signal_power_400_autobal, data_autobal_400, '--o',color="blue" , label='Measured Signal Autobalanced')# (Log Output)')
-#plt.axhline(v_shot_rms, color='r', linestyle='--', label="Shot Noise") # Calculated shot noise level
-#plt.axhline(2.39e-5, color='r', linestyle='--', label="Shot Noise") # Shot noise level from simulations
-plt.axvline(one_photon, color='black', linestyle='--', label="One Photon/s")
-plt.axvline(one_photon/0.14 , color='black', linestyle='--', label="One Photon/0.14 s", alpha=0.5)
-plt.xlim(1e-2, 1e-21)
-plt.ylim(1e-7, 100)
-plt.xlabel('Signal Arm Power [W]')
-plt.ylabel('Measured Signal [V]')
-#plt.title('BHD Signal vs. Signal Arm Power ')
-plt.title('Experimental data (Balanced, 1 mW LO)')
-plt.legend(loc='lower left')#, bbox_to_anchor=(0,0.15))
-ax1.xaxis.grid(visible=True, which='both')
-ax1.yaxis.grid(visible=True, which='major')
-#ax1.axvspan(signal_power_400_bal[0], 1e-12, alpha=0.1, color='green')
+print(signal_power.shape)
+print(series_simulated_means.shape)
+# Standard Deviation
+df = pd.DataFrame(np.array([signal_power,series_simulated_means]).T, columns=["key", "val"])
+df = df.groupby("key").val.apply(pd.Series.tolist)
+print(df)
+keys = df.index.to_numpy()
+std_array = df.apply(np.std).to_numpy()
 
-ax2 = ax1.secondary_xaxis("top", functions=(power_to_photons, lambda N: N * E_photon))  # transform function and its inverse
-ax2.set_xlabel("Signal Arm [Photons/s]")
+# Plot attenuation series
+if 1:
+  fig, ax1 = plt.subplots(figsize=(8,6))
+  #plt.loglog(x_axis_voltage, expected_voltage)
+  #plt.loglog(x_axis, expected_voltage, label='g*r*4*Es*ELO')
+  #plt.loglog(x_axis, y_fit, label="Balanced Fit")
+  plt.gca().invert_xaxis()  # Inverts the x-axis
+  #plt.loglog(signal_voltage, data)
+  #plt.loglog([signal_power[len(series_simulated_means)//4], series_simulated_means[len(series_simulated_means)//4]], [signal_power[3*len(series_simulated_means)//4], series_simulated_means[3*len(series_simulated_means)//4]], 'g--',alpha=0.3)# (Linear Output)') #'--o' #series_simulated_means.max()*np.logspace(-15,0)**.5
+  plt.loglog(signal_power[len(series_simulated_means)//4]*np.logspace(-15,8), series_simulated_means[len(series_simulated_means)//4]*np.logspace(-15,8)**.5, 'g--',alpha=0.3)# (Linear Output)') #'--o' #series_simulated_means.max()*np.logspace(-15,0)**.5
+  #plt.loglog(signal_power.max()*np.logspace(-15,0), series_simulated_means.max()*np.logspace(-15,0)**.5, 'g--',alpha=0.3)# (Linear Output)') #'--o' #series_simulated_means.max()*np.logspace(-15,0)**.5
+  plt.loglog(signal_power, series_simulated_means, 'o', color="green", label='Signal Balanced')# (Linear Output)') #'--o'
+  plt.loglog(keys, std_array, 'o', color="orange", label='Signal Balanced')# (Linear Output)') #'--o'
+  #plt.loglog(signal_power, simulated_onlyshot, 'o', color="green", label='Simulated Signal Balanced (Only Shot Noise)')# (Linear Output)') #'--o'
+  #plt.loglog(a,b, '--o',color="green", label='test')# (Linear Output)')
+  #plt.loglog(signal_power_400_autobal, data_autobal_400, '--o',color="blue" , label='Measured Signal Autobalanced')# (Log Output)')
+  #plt.axhline(v_shot_rms, color='r', linestyle='--', label="Shot Noise") # Calculated shot noise level
+  #plt.axhline(2.39e-5, color='r', linestyle='--', label="Shot Noise") # Shot noise level from simulations
+  plt.axvline(one_photon, color='black', linestyle='--', label="One Photon/s")
+  #signal_photons = 12e-6 / 500e-6 + 246e-6 / 500e-6
+  plt.axvline(one_photon/(0.06*4.2) , color='black', linestyle='--', label="One Photon/0.252 s", alpha=0.5)
+  plt.xlim(1e-2, 1e-21)
+  plt.ylim(1e-7, 100)
+  plt.xlabel('Signal Arm Power [W]')
+  plt.ylabel('Measured Signal [V]')
+  #plt.title('BHD Signal vs. Signal Arm Power ')
+  plt.title('Experimental data (Balanced, 1 mW LO)')
+  plt.legend(loc='lower left')#, bbox_to_anchor=(0,0.15))
+  ax1.xaxis.grid(visible=True, which='both')
+  ax1.yaxis.grid(visible=True, which='major')
+  #ax1.axvspan(signal_power_400_bal[0], 1e-12, alpha=0.1, color='green')
 
-plt.show()
+  ax2 = ax1.secondary_xaxis("top", functions=(power_to_photons, lambda N: N * E_photon))  # transform function and its inverse
+  ax2.set_xlabel("Signal Arm [Photons/s]")
+
+  plt.show()
