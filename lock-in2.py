@@ -615,7 +615,7 @@ def load(filename):
 #filenames = glob.glob("*-delay.isf")
 
 # Simulation data
-#filenames = glob.glob("C:\\Users/Admin/Documents/bhd-simulations/only_shot/tim_onlyshot_*.npz")
+filenames = glob.glob("C:\\Users/Admin/Documents/bhd-simulations/allrin3/tim_allrin3_*.npz")
 
 # PLotting test
 #filenames = glob.glob("E:\Measurements/46/2025-06-03-mod\\tek0014CH1.isf")
@@ -623,10 +623,10 @@ def load(filename):
 #filenames = glob.glob("E:\Measurements/46/2025-06-03-mod2/tek*CH1.isf")#)"tek*CH1.isf")
 
 # Bal 1mW
-filenames1 = glob.glob("E:\Measurements/46/2025-06-03-mod/tek*CH1.isf")#BHD1.dat)
-filenames2 = glob.glob("E:\Measurements/46/2025-06-03-mod/1mW-new-tek*CH1.isf")
-filenames3 = glob.glob("E:\Measurements/46/2025-06-03-mod/1mW-new2-tek*CH1.isf")
-filenames4 = glob.glob("E:\Measurements/46/2025-06-03-mod/1mW-new3-tek*CH1.isf")
+#filenames1 = glob.glob("E:\Measurements/46/2025-06-03-mod/tek*CH1.isf")#BHD1.dat)
+#filenames2 = glob.glob("E:\Measurements/46/2025-06-03-mod/1mW-new-tek*CH1.isf")
+#filenames3 = glob.glob("E:\Measurements/46/2025-06-03-mod/1mW-new2-tek*CH1.isf")
+#filenames4 = glob.glob("E:\Measurements/46/2025-06-03-mod/1mW-new3-tek*CH1.isf")
 
 # AutoBal 1mW
 #filenames1 = glob.glob("E:\Measurements/46/2025-06-03-mod2/tek*CH1.isf")#BHD1.dat)
@@ -634,7 +634,7 @@ filenames4 = glob.glob("E:\Measurements/46/2025-06-03-mod/1mW-new3-tek*CH1.isf")
 #filenames3 = glob.glob("E:\Measurements/46/2025-06-03-mod2/1mW-new2-tek*CH1.isf")
 #filenames4 = glob.glob("E:\Measurements/46/2025-06-03-mod2/1mW-new3-tek*CH1.isf")
 
-filenames = filenames1 + filenames2 + filenames3 + filenames4
+#filenames = filenames1 + filenames2 + filenames3 + filenames4
 
 #filenames = ["500microWLO-1,6V-delayPD-20MS-40s-nenir40ac-delay.isf"]
 #filenames = ["tek0013CH1.isf"]
@@ -847,9 +847,9 @@ for file_name in filenames:
     t_no_turningpoints = t_no_turningpoints[1:]
     cal_no_turningpoints = cal_no_turningpoints[1:]
 
-    sig_no_turningpoints = sig_no_turningpoints[:5]
-    t_no_turningpoints = t_no_turningpoints[:5]
-    cal_no_turningpoints = cal_no_turningpoints[:5]
+    sig_no_turningpoints = sig_no_turningpoints[:10]
+    t_no_turningpoints = t_no_turningpoints[:10]
+    cal_no_turningpoints = cal_no_turningpoints[:10]
 
     #sig_no_turningpoints = sig_no_turningpoints[:-1]  # allan
     #t_no_turningpoints = t_no_turningpoints[:-1]      # allan

@@ -18,11 +18,11 @@ import frshelpers.plot, frshelpers.ops # pip install git+https://gitlab.com/lebe
 from .parts import *
 
 def tims_setup(**kwargs):
-  shot_noise = kwargs.get("shot_noise", False) # whether to consider shot noise
-  OD_filter_transmissions = kwargs.get("OD_filter_transmissions", np.repeat(np.logspace(-7, -17, 15), 1))#[5.85000000e-05, 2.05335000e-08, 1.90086823e-10, 1.50348412e-11, 4.71833512e-12, 4e-13, 4e-14, 4e-15, 4e-16])
+  shot_noise = kwargs.get("shot_noise", True) # whether to consider shot noise
+  OD_filter_transmissions = kwargs.get("OD_filter_transmissions", np.repeat(np.logspace(2, -20, 23), 1))#[5.85000000e-05, 2.05335000e-08, 1.90086823e-10, 1.50348412e-11, 4.71833512e-12, 4e-13, 4e-14, 4e-15, 4e-16])
   power_lo = kwargs.get("power_lo", 500e-6)
 
-  digitization_noise = kwargs.get("digitization_noise", False) # whether to consider the noise of the oscilloscope (in the code, this is desactivated for the calibration PD and only used for the balanced detector)
+  digitization_noise = kwargs.get("digitization_noise", True) # whether to consider the noise of the oscilloscope (in the code, this is desactivated for the calibration PD and only used for the balanced detector)
   digitization_max_level = kwargs.get("digitization_max_level", 5e-3) # the max level of the oscilloscope in V (goes from -max_level to +max_level. Example: 1mV/Div means 10 mV range, so max_level=5mV)
   digitization_enobs = kwargs.get("digitization_enobs", 6) # effective number of bits of the oscilloscope (check)
 
@@ -35,15 +35,29 @@ def tims_setup(**kwargs):
   scan_frequency = kwargs.get("scan_frequency", 0.8**-1) # frequency of the delay stage motion
   mirror_bandwidth = kwargs.get("delaystage_bandwidth", 0.07**-1) # inverse reaction time of the delay stage to velocity changes (to avoid/smooth out abrupt turnings)
 
-  measurement_time = kwargs.get("measurement_time", 2.) # measurement time in seconds
+  measurement_time = kwargs.get("measurement_time", 10.) # measurement time in seconds
 
   responsivity = kwargs.get("responsivity", .67e5) # product of responsivity (in A/W) and gain (V/A), of balanced detector
   dc_responsivity = kwargs.get("dc_responsivity", .67e5/5)
   responsivity_cal = kwargs.get("responsivity_cal", 4e1) # product of responsivity (in A/W) and gain (V/A), of calibration PD
-  NEP = kwargs.get("NEP", 0)#3e-12) # NEP of balanced detector; data sheet says 3e-12
+
+  rin = kwargs.get("rin", True)
+  if rin:
+    power_lo = np.load("E:\\Measurements/46/2025-06-23/500microWsignal-complete-power.npy")[1]
+    #print(power_lo.size)
+    power_lo = power_lo / dc_responsivity  #power_lo[:(power_lo.size//5)] / dc_responsivity
+    #print(power_lo.size)
+    print(power_lo[:10])
+
+  ununiformity = kwargs.get("ununiformity", False)
+  if ununiformity:
+    time_axis = np.load("E:\\Measurements/46/2025-06-23/500microWsignal-complete-power.npy")[0]
+    ununiformity_offset = 4e-3 * np.cos(scan_frequency * 2 * np.pi * time_axis)
+
+  NEP = kwargs.get("NEP", 03e-12) # NEP of balanced detector; data sheet says 3e-12
   NEP_cal = kwargs.get("NEP_cal", 0) # NEP of calibration PD - it probably won't affect our data in any way
 
-  delay_jitter = kwargs.get("delay_jitter", False) # whether to add delay jitter (sinusoidal)
+  delay_jitter = kwargs.get("delay_jitter", True) # whether to add delay jitter (sinusoidal)
   max_delay_modulation = kwargs.get("max_delay_modulation", .02e-12) # maximum delay deviation of this jitter
   delay_modulation_frq = kwargs.get("delay_modulation_frq", 0.01**-1) # frequency of the sinusoidal jitter
 
@@ -88,12 +102,19 @@ def tims_setup(**kwargs):
       rel_I_S_to_pd1_s = 241e-6 / 500e-6
       rel_I_S_to_pd2_s = 0e-6 / 500e-6
 
+      """ # Add RIN
+      if 0:
+        rin_factor = 20
+      else:
+        rin_factor = 1 """
+
       # PBS implementation
       omega = 2 * np.pi * nu
       k = omega/constants.c
       #np.exp(1j*omega*t) cancels
       #power_pd1_p = np.abs(np.sqrt(rel_I_LO_to_pd1_p * power_lo) * np.exp(1j*omega*t - 1j*k*delay*constants.c) + np.sqrt(rel_I_S_to_pd1_p * power_signal) * np.exp(1j*omega*t))**2#power_signal/2 + power_lo/2 + np.sqrt(power_signal*power_lo)*np.sin(2*np.pi*nu*delay)
       power_pd1_p = np.abs(np.sqrt(rel_I_LO_to_pd1_p * power_lo) * np.exp(- 1j*k*delay*constants.c) + np.sqrt(rel_I_S_to_pd1_p * power_signal))**2
+      #power_pd1_p = (np.abs(np.sqrt(rel_I_LO_to_pd1_p * power_lo)))**2 + (np.abs(np.sqrt(rel_I_S_to_pd1_p * power_signal)))**2 + 2 * np.real(np.exp(- 1j*k*delay*constants.c)) * (np.abs(np.sqrt(rel_I_LO_to_pd1_p * power_lo))) * (np.abs(np.sqrt(rel_I_S_to_pd1_p * power_signal)))
       power_pd2_p = np.abs(np.sqrt(rel_I_LO_to_pd2_p * power_lo) * np.exp(- 1j*k*delay*constants.c) - np.sqrt(rel_I_S_to_pd2_p * power_signal))**2
 
       #power_pd1_p = rel_I_LO_to_pd1_p * power_lo + rel_I_S_to_pd1_p * power_signal + 2 * np.sqrt(rel_I_LO_to_pd1_p * power_lo * rel_I_S_to_pd1_p * power_signal) * np.cos(k*delay*constants.c)
@@ -188,10 +209,13 @@ def tims_setup(**kwargs):
     plt.axhline(0)
     plt.show() """
 
-    diff = ((d1-d2)*int(not disconnect_BNC) for d1,d2 in zip(voltage_pd1, voltage_pd2))
+    if ununiformity:
+      diff = (((d1-d2)+o)*int(not disconnect_BNC) for d1,d2,o in zip(voltage_pd1, voltage_pd2, ununiformity_offset))
+    else:
+      diff = ((d1-d2)*int(not disconnect_BNC) for d1,d2 in zip(voltage_pd1, voltage_pd2))
 
     # Detector saturation
-    if 0:
+    if 1:
       V_max = 200e-6 * responsivity # saturation power (diff between PDs) [W] * responsivity [V/W]
       diff = ((V_max * np.tanh(d1/ V_max))*int(not disconnect_BNC) for d1 in diff) #V_max * np.tanh(diff / V_max)
     #diff = (np.clip(d1, -V_max/2, V_max/2)*int(not disconnect_BNC) for d1 in zip(diff)) #V_max * np.tanh(diff / V_max)
@@ -205,7 +229,7 @@ def tims_setup(**kwargs):
     calpd = chunkiter.tools.concatenate(voltage_calpd)
   
     #np.savez("tim.npz", diff=diff, cal=calpd)
-    np.savez("test11/tim_{}_{:.5e}_{}.npz".format(file_suffix, OD_filter_transmission, j), diff=diff, cal=calpd, transmission=OD_filter_transmission, kwargs=kwargs)
+    np.savez("allrin3/tim_{}_{:.5e}_{}.npz".format(file_suffix, OD_filter_transmission, j), diff=diff, cal=calpd, transmission=OD_filter_transmission, kwargs=kwargs)
   
   """ if plot:
     plt.figure()
