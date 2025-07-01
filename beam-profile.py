@@ -5,6 +5,13 @@ import matplotlib.gridspec as gridspec
 #from matplotlib.font_manager import FontProperties
 
 #import matplotlib.font_manager as fm
+
+plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "serif",
+    "font.size": 26,
+    "text.latex.preamble": r"\usepackage{lmodern}"
+})
 """ import matplotlib as mpl
 print(mpl.get_cachedir()) """
 
@@ -49,12 +56,6 @@ plt.show() """
     "text.usetex": False                  # Must be False to use .otf directly
 }) """
 
-plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "serif",
-    "font.size": 11,
-    "text.latex.preamble": r"\usepackage{lmodern}"
-})
 
 """ # Create figure and grid layout
 fig = plt.figure(figsize=(10, 5))
@@ -98,7 +99,7 @@ plt.show() """
 
 # Create figure and grid layout
 fig = plt.figure(figsize=(10, 5))
-fig.suptitle('Overlapping Beamsplitter Outputs for optimal Interference')
+fig.suptitle("Diffraction Pattern based Alignment of Beams in each Output of the Recombining Beam Splitter")#'Aligning Beams in each Beam Splitter Output for Optimal Interference')
 gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 0.05], wspace=0.3)#, height_ratios=[1,1,0.8])
 
 # Subplots
@@ -108,19 +109,19 @@ cax = fig.add_subplot(gs[2])  # Colorbar axis
 
 # Plot beam profiles
 im1 = ax1.imshow(beam_data, cmap='hot', origin='lower')
-ax1.set_title("Displaced Beams")
+ax1.set_title("Displaced Beams")#"LO")
 #ax1.set_ylabel("Y Position [Pixel]")
 
 im2 = ax2.imshow(beam_data2, cmap='hot', origin='lower')
-ax2.set_title("Overlapped Beams")
+ax2.set_title("Overlapped Beams")#"Signal")
 
 # Shared colorbar
 cbar = fig.colorbar(im2, cax=cax)
-cbar.set_label("Intensity", fontsize="11")
+cbar.set_label("Intensity")#, fontsize="11")
 
 # Common x-axis label
-fig.supxlabel("X Position [Pixel]", fontsize=11)
-fig.supylabel("Y Position [Pixel]", fontsize=11)
+fig.supxlabel("X Position [Pixel]")#, fontsize=11)
+fig.supylabel("Y Position [Pixel]")#, fontsize=11)
 
 # --- Resize colorbar manually ---
 # Get the current position
